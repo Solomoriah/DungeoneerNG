@@ -53,6 +53,7 @@ class Item:
 
     def __init__(self):
 
+        self.category = "treasure"
         self.value = 0.0
         self.name = ''
         self.desc = []

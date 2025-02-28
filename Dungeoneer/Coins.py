@@ -1,5 +1,5 @@
 # Basic Fantasy RPG Dungeoneer Suite
-# Copyright 2007-2024 Chris Gonnerman
+# Copyright 2007-2025 Chris Gonnerman
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -44,7 +44,9 @@ _kinds = {
     "pp": ("Platinum Pieces",  5.0),
 }
 
+
 class Coin(_Treasure.Item):
+
     def __init__(self, kind = "gp", qty = 1):
         _Treasure.Item.__init__(self)
         self.cat = "Coin"
@@ -63,7 +65,7 @@ class Coin(_Treasure.Item):
         if self.qty != 1:
             s = s + ("%10.2f" % float(self.qty))
 
-        s = s + (" (%10.2f GP total)" % (float(self.value) * self.qty))
+        s = s + (" (%10.2f gp total)" % (float(self.value) * self.qty))
 
         return s
 
