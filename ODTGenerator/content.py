@@ -32,6 +32,9 @@
 
 content_body = None
 
+nbsp = chr(160)
+tab = '''<text:tab/>'''
+
 
 def document(s):
     global content_body
@@ -42,8 +45,8 @@ def document(s):
     return s.join(content_body.split("@text@"))
 
 
-def tab():
-    return '''<text:tab/>'''
+def nonbreak(s):
+    return nbsp.join(s.split())
 
 
 def bold(s):

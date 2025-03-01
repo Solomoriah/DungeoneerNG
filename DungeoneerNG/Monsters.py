@@ -47,7 +47,7 @@ class Monster(object):
             setattr(self, key, m[key])
         self.hitpoints = []
         if mode != "one":
-            roll = getattr(self, "noapproll%s" % mode, self.noapprolldungeon)
+            roll = getattr(self, "noapproll%s" % mode, (0, 0, 1))
             self.noapp = Dice.D(*roll)
         else:
             self.noapp = 1
