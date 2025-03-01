@@ -42,12 +42,12 @@ def document(s):
     return s.join(content_body.split("@text@"))
 
 
-def boxedtext(s):
-    return '''<text:p text:style-name="BoxedText">%s</text:p>''' % s
+def tab():
+    return '''<text:tab/>'''
 
 
-def columns(s):
-    return '''<text:section text:style-name="Sect1" text:name="Section1">%s</text:section>''' % s
+def bold(s):
+    return '''<text:span text:style-name="T1">%s</text:span>''' % s
 
 
 def hpcheckboxes(s):
@@ -58,28 +58,8 @@ def hpchecksend(s):
     return '''<text:p text:style-name="HPChecksEnd">%s</text:p>''' % s
 
 
-def mapkeyheading(s):
-    return '''<text:h text:style-name="MapKeyHeading" text:outline-level="3">%s</text:h>''' % s
-
-
 def monsterblock(s):
     return '''<text:p text:style-name="MonsterBlock">%s</text:p>''' % s
-
-
-def subheading(s):
-    return '''<text:h text:style-name="SubHeading" text:outline-level="2">%s</text:h>''' % s
-
-
-def textbody(s):
-    return '''<text:p text:style-name="P21">%s</text:p>''' % s
-
-
-def wanderingmonsterbody(s):
-    return '''<text:p text:style-name="WanderingMonsterBody">%s</text:p>''' % s
-
-
-def wanderingmonsterend(s):
-    return '''<text:p text:style-name="WanderingMonsterEnd">%s</text:p>''' % s
 
 
 # end of file.

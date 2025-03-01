@@ -1,4 +1,6 @@
-# Basic Fantasy RPG Dungeoneer Suite
+#!/usr/bin/python3
+
+# Basic Fantasy RPG DungeoneerNG Suite
 # Copyright 2007-2025 Chris Gonnerman
 # All rights reserved.
 #
@@ -30,29 +32,37 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
+import cgi, time, traceback, sys
+
 try:
-    from DungeoneerNG import _Monsters, Dice
+    sys.path.append(".")
+    from DungeoneerNG import Monsters
+    form = cgi.FieldStorage()
+    target = form.getfirst("target", "").lower()
+    rc = []
+    if target:
+        keys = sorted(Monsters.monsters.keys())
+        for key in keys:
+            if key.lower().startswith(target):
+                m = Monsters.monsters[key]
+                dngnoapp = [ "one" ]
+                if "noapprolldungeon" in m:
+                    dngnoapp.append("dungeon")
+                if "noapprolllair" in m:
+                    dngnoapp.append("lair")
+                if "noapprollwild" in m:
+                    dngnoapp.append("wild")
+                rc.append((key, ",".join(dngnoapp)))
+            if len(rc) == 10:
+                break
+    print("Content-type: text/html\n")
+    print("\n".join(map(lambda s: "<option value='%s' data-noapp='%s'>%s</option>" % (s[0], s[1], s[0]), rc)))
+
 except:
-    import _Monsters, Dice
-
-
-monsters = _Monsters.monsters
-
-class Monster(object):
-
-    def __init__(self, name, mode = "one"):
-        self.category = "monster"
-        m = _Monsters.monsters[name]
-        for key in m.keys():
-            setattr(self, key, m[key])
-        self.hitpoints = []
-        if mode != "one":
-            roll = getattr(self, "noapproll%s" % mode, self.noapprolldungeon)
-            self.noapp = Dice.D(*roll)
-        else:
-            self.noapp = 1
-        for i in range(self.noapp):
-            self.hitpoints.append(Dice.D(*self.hitdiceroll))
+    print("Content-type: text/plain\n")
+    print("<pre>")
+    traceback.print_exc(file = sys.stdout)
+    print("</pre>")
 
 
 # end of file.
