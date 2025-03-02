@@ -46,15 +46,61 @@ class Monster(object):
         for key in m.keys():
             setattr(self, key, m[key])
         self.hitpoints = []
+        self.noapp = 1
         if noapp is not None:
             self.noapp = noapp
         elif mode != "one":
             roll = getattr(self, "noapproll%s" % mode, (0, 0, 1))
-            self.noapp = Dice.D(*roll)
-        else:
-            self.noapp = 1
+            if type(roll) is tuple:
+                self.noapp = Dice.D(*roll)
         for i in range(self.noapp):
             self.hitpoints.append(max(1, Dice.D(*self.hitdiceroll)))
+
+
+trollkin_table = {
+    1: 'Trollkin, Infant, 1 HD',
+    2: 'Trollkin, Infant, 2 HD',
+    3: 'Trollkin, Juvenile, 3 HD',
+    4: 'Trollkin, Juvenile, 4 HD',
+    5: 'Trollkin, Adolescent, 5 HD',
+    6: 'Trollkin, Adolescent, 6 HD',
+}
+
+
+def trollwifelair_generator(m):
+
+    roll = Dice.D(1, 10, 0)
+
+    if roll == 1:
+        return [ m ]
+
+    if roll > 3:
+        return [ m, Monster('Troll', 'one') ]
+
+    rc = [ m ]
+    nkin = Dice.D(1, 6, 0)
+    kinhd = Dice.D(2, 6, 0)
+    while (kinhd / nkin) > 6.0:
+        nkin += 1
+
+    basekinhd = kinhd // nkin
+    remain = kinhd % nkin
+
+    # now we know the size of the trollkin;
+    #   remain are basekinhd+1,
+    #   nkin - remain are basekinhd
+    # generate them in that order
+
+    if remain:
+        rc.append(Monster(trollkin_table[basekinhd+1], noapp = remain))
+    rc.append(Monster(trollkin_table[basekinhd], noapp = (nkin - remain)))
+
+    return rc
+
+
+generators = {
+    'trollwifelair': trollwifelair_generator,
+}
 
 
 def MonsterFactory(name, mode = "one"):
@@ -63,6 +109,11 @@ def MonsterFactory(name, mode = "one"):
         return [ Monster(name, mode) ]
 
     prime = Monster(name, mode)
+
+    roll = getattr(prime, "noapproll%s" % mode, None)
+    if type(roll) is type('') and roll in generators:
+        return generators[roll](prime)
+
     if not hasattr(prime, "leaders"):
         return [ prime ]
 
