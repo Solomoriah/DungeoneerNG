@@ -38,11 +38,13 @@ import random
 
 Select = random.choice
 
+
 def D(n, s, b = 0, m = 1):
     res = b
     for i in range(n):
         res = res + random.randint(1, s)
     return res * m
+
 
 def NRoll(table):
     "NRoll() handles single-level tables, returning the index"
@@ -60,6 +62,14 @@ def NRoll(table):
 def Roll(table):
     "Roll() handles single-level tables, returning the row"
     return table[NRoll(table)]
+
+
+def rollunder(argtup):
+    if argtup is None:
+        return True
+    n, s, b, t = argtup
+    roll = D(n, s, b)
+    return roll <= t
 
 
 def MRoll(table):

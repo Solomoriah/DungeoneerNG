@@ -40,19 +40,52 @@ monsters = _Monsters.monsters
 
 class Monster(object):
 
-    def __init__(self, name, mode = "one"):
+    def __init__(self, name, mode = "one", noapp = None):
         self.category = "monster"
         m = _Monsters.monsters[name]
         for key in m.keys():
             setattr(self, key, m[key])
         self.hitpoints = []
-        if mode != "one":
+        if noapp is not None:
+            self.noapp = noapp
+        elif mode != "one":
             roll = getattr(self, "noapproll%s" % mode, (0, 0, 1))
             self.noapp = Dice.D(*roll)
         else:
             self.noapp = 1
         for i in range(self.noapp):
-            self.hitpoints.append(Dice.D(*self.hitdiceroll))
+            self.hitpoints.append(max(1, Dice.D(*self.hitdiceroll)))
+
+
+def MonsterFactory(name, mode = "one"):
+
+    if mode == "one":
+        return [ Monster(name, mode) ]
+
+    prime = Monster(name, mode)
+    if not hasattr(prime, "leaders"):
+        return [ prime ]
+
+    totalapp = prime.noapp
+    rc = [ prime ]
+
+    last_ldr = None
+    for num_m, ldr_mode, ldr_single, ldr_name, ldr_odds in prime.leaders:
+        if num_m and totalapp < num_m:
+            continue
+        if (ldr_mode == "all" or ldr_mode == mode) and Dice.rollunder(ldr_odds):
+            if ldr_single == 2 and ldr_name == last_ldr:
+                continue
+            last_ldr = ldr_name
+            if ldr_single:
+                nldr = 1
+            else:
+                nldr = totalapp // num_m
+            prime.noapp -= nldr
+            prime.hitpoints = prime.hitpoints[:prime.noapp]
+            rc.append(Monster(ldr_name, noapp = nldr))
+
+    return rc
 
 
 # end of file.
