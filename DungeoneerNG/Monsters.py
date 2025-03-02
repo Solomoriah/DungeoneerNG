@@ -55,6 +55,7 @@ class Monster(object):
                 self.noapp = Dice.D(*roll)
         for i in range(self.noapp):
             self.hitpoints.append(max(1, Dice.D(*self.hitdiceroll)))
+        myequipment = getattr(self, "equipment", None)
         wpntbl = getattr(self, "weapontable", None)
         if wpntbl:
             primary = None
@@ -62,11 +63,13 @@ class Monster(object):
             while primary is None:
                 wpn = Dice.tableroller(wpntbl)
                 if wpn[2]:
-                    secondary = (wpn[1], wpn[3])
+                    secondary = (wpn[1], wpn[3], wpn[-1])
                 else:
-                    primary = (wpn[1], wpn[3])
+                    primary = (wpn[1], wpn[3], wpn[-1])
             if secondary is None:
-                secondary = (None, None)
+                secondary = (None, None, None)
+            if myequipment is not None:
+                self.equipment = ", ".join(filter(None, [ primary[2], secondary[2], myequipment ]))
             self.noattacks = "%s %s" % (self.baseattack, " or ".join(filter(None, [ primary[0], secondary[0] ])))
             self.damage = ", ".join(filter(None, [ self.basedamage, primary[1], secondary[1] ]))
 
