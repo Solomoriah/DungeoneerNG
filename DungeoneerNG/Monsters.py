@@ -55,6 +55,20 @@ class Monster(object):
                 self.noapp = Dice.D(*roll)
         for i in range(self.noapp):
             self.hitpoints.append(max(1, Dice.D(*self.hitdiceroll)))
+        wpntbl = getattr(self, "weapontable", None)
+        if wpntbl:
+            primary = None
+            secondary = None
+            while primary is None:
+                wpn = Dice.tableroller(wpntbl)
+                if wpn[2]:
+                    secondary = (wpn[1], wpn[3])
+                else:
+                    primary = (wpn[1], wpn[3])
+            if secondary is None:
+                secondary = (None, None)
+            self.noattacks = "%s %s" % (self.baseattack, " or ".join(filter(None, [ primary[0], secondary[0] ])))
+            self.damage = ", ".join(filter(None, [ self.basedamage, primary[1], secondary[1] ]))
 
 
 trollkin_table = {
