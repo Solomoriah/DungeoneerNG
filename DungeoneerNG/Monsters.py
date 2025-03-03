@@ -38,6 +38,7 @@ except:
 
 monsters = _Monsters.monsters
 
+
 class Monster(object):
 
     def __init__(self, name, mode = "one", noapp = None):
