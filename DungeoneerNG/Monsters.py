@@ -44,6 +44,11 @@ class Monster(object):
     def __init__(self, name, mode = "one", noapp = None):
         self.category = "monster"
         m = _Monsters.monsters[name]
+        if "alternatetable" in m:
+            oldm = m
+            m = _Monsters.monsters[Dice.tableroller(m["alternatetable"])[1]]
+            m["alternatetable"] = oldm["alternatetable"]
+            m["allunique"] = oldm.get("allunique", 0)
         for key in m.keys():
             setattr(self, key, m[key])
         self.hitpoints = []
@@ -59,16 +64,23 @@ class Monster(object):
         myequipment = getattr(self, "equipment", None)
         wpntbl = getattr(self, "weapontable", None)
         if wpntbl:
+            # weapon tables need to start with a primary weapon; code below
+            # avoids running too many loops looking for one randomly by
+            # selecting the first after 6 tries.
             self.baseattack = getattr(self, "baseattack", '')
             self.basedamage = getattr(self, "basedamage", '')
             primary = None
             secondary = None
-            while primary is None:
+            for i in range(6):
                 wpn = Dice.tableroller(wpntbl)
                 if wpn[2]:
                     secondary = (wpn[1], wpn[3], wpn[-1])
                 else:
                     primary = (wpn[1], wpn[3], wpn[-1])
+                    break
+            if primary is None:
+                wpn = wpntbl[1]
+                primary = (wpn[1], wpn[3], wpn[-1])
             if secondary is None:
                 secondary = (None, None, None)
             if myequipment is not None:
@@ -129,6 +141,26 @@ def MonsterFactory(name, mode = "one"):
         return [ Monster(name, mode) ]
 
     prime = Monster(name, mode)
+
+    if hasattr(prime, "alternatetable"):
+        # to begin with, we're effectively discarding prime here
+        alt_track = { }
+        allunique = getattr(prime, "allunique", 0)
+        for row in prime.alternatetable[1:]:
+            alt_track[row[1]] = 0
+        for i in range(prime.noapp):
+            row = Dice.tableroller(prime.alternatetable)
+            alt_track[row[1]] += 1
+        # now we know how many there are, let's create them.
+        rc = []
+        for row in prime.alternatetable[1:]:
+            if alt_track[row[1]]:
+                if allunique:
+                    for i in range(alt_track[row[1]]):
+                        rc.append(Monster(row[1], "one"))
+                else:
+                    rc.append(Monster(row[1], noapp = alt_track[row[1]]))
+        return rc
 
     roll = getattr(prime, "noapproll%s" % mode, None)
     if type(roll) is type('') and roll in generators:
