@@ -58,6 +58,8 @@ class Monster(object):
         myequipment = getattr(self, "equipment", None)
         wpntbl = getattr(self, "weapontable", None)
         if wpntbl:
+            self.baseattack = getattr(self, "baseattack", '')
+            self.basedamage = getattr(self, "basedamage", '')
             primary = None
             secondary = None
             while primary is None:
