@@ -135,12 +135,96 @@ generators = {
 }
 
 
+def DragonCustomize(m):
+
+    m.name = "%s, Age Category %d" % (m.name, m.agecategory)
+    m.names = "%s, Age Category %d" % (m.names, m.agecategory)
+    m.noattacks = []
+    m.damage = []
+    m.casting = 0
+
+    state = "main"
+
+    for row in m.dragontable:
+
+        if row == "Spells by Level":
+            state = "spells"
+
+        elif row == "Attacks":
+            state = "attacks"
+
+        elif row[0] == "Hit Dice":
+            m.hitdice = row[m.agecategory]
+
+        elif row[0] == "Hit Dice Roll":
+            m.hitdiceroll = row[m.agecategory]
+
+        elif row[0] == "Attack Bonus":
+            m.attackbonus = row[m.agecategory]
+
+        elif row[0] == "Breath Weapon":
+            m.breathweapon = row[1]
+
+        elif row[0] == "Length":
+            m.breathweapon = "%s %s" % (m.breathweapon, row[m.agecategory])
+
+        elif row[0] == "Width":
+            m.breathweapon = "%s%s" % (m.breathweapon, row[m.agecategory])
+
+        elif row[0] == 'Chance of Talking':
+            m.talking = Dice.D(1, 100, 0) <= row[m.agecategory]
+            if m.talking and m.agecategory > 1:
+                m.casting = Dice.D(1, 100, 0) <= row[m.agecategory]
+                if m.casting:
+                    m.spelllevels = []
+
+        elif state == "spells" and m.casting:
+            m.spelllevels.append(row[m.agecategory])
+
+        elif state == "attacks":
+            no = 1
+            if row[0] == "Claw":
+                no = 2
+            m.noattacks.append("%d %s" % (no, row[0].lower()))
+            m.damage.append("%d %s" % (no, row[m.agecategory]))
+
+    m.noattacks = ", ".join(m.noattacks)
+    m.noattacks = "%s or 1 %s" % (m.noattacks, m.breathweapon)
+
+    m.damage.append("%dd8 %s" % (m.hitdiceroll[0], m.breathweapon))
+    m.damage = ", ".join(m.damage)
+
+
+def DragonFactory(prime, name, mode, agecategory = 0):
+    
+    # regardless of mode, the prime dragon needs to be customized
+    if agecategory:
+        prime.agecategory = agecategory
+    else:
+        prime.agecategory = Dice.D(1, 6, 1)
+    DragonCustomize(prime)
+
+    # reroll all hit points
+
+    prime.hitpoints = []
+    for i in range(prime.noapp):
+        prime.hitpoints.append(max(1, Dice.D(*prime.hitdiceroll)))
+
+    # fix later
+    return [ prime ]
+
+
 def MonsterFactory(name, mode = "one"):
 
-    if mode == "one":
-        return [ Monster(name, mode) ]
-
     prime = Monster(name, mode)
+
+    if hasattr(prime, "dragontable"):
+        return DragonFactory(prime, name, mode)
+
+    if mode == "one":
+        prime.noapp = 1
+        prime.hitpoints = [ prime.hitpoints[0] ]
+        return [ prime ]
 
     if hasattr(prime, "alternatetable"):
         # to begin with, we're effectively discarding prime here
