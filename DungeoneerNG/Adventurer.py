@@ -1,4 +1,4 @@
-# Basic Fantasy RPG Dungeoneer Suite
+# Basic Fantasy RPG Dungeoneer Next Generation Suite
 # Copyright 2007-2025 Chris Gonnerman
 # All rights reserved.
 #

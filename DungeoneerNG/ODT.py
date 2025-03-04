@@ -53,6 +53,10 @@ def bold(s):
     return '''<text:span text:style-name="T1">%s</text:span>''' % s
 
 
+def italic(s):
+    return '''<text:span text:style-name="T2">%s</text:span>''' % s
+
+
 def hpcheckboxes(s):
     return '''<text:p text:style-name="HPCheckBoxes">%s</text:p>''' % s
 

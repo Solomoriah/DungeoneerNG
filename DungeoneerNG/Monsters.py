@@ -1,4 +1,4 @@
-# Basic Fantasy RPG Dungeoneer Suite
+# Basic Fantasy RPG Dungeoneer Next Generation Suite
 # Copyright 2007-2025 Chris Gonnerman
 # All rights reserved.
 #
@@ -31,9 +31,9 @@
 
 
 try:
-    from DungeoneerNG import _Monsters, Dice
+    from DungeoneerNG import _Monsters, Dice, Spells, Adventurer
 except:
-    import _Monsters, Dice
+    import _Monsters, Dice, Spells, Adventurer
 
 
 monsters = _Monsters.monsters
@@ -44,6 +44,7 @@ class Monster(object):
     def __init__(self, name, mode = "one", noapp = None):
         self.category = "monster"
         m = _Monsters.monsters[name]
+        notes = []
         if "alternatetable" in m:
             oldm = m
             m = _Monsters.monsters[Dice.tableroller(m["alternatetable"])[1]]
@@ -59,6 +60,28 @@ class Monster(object):
             roll = getattr(self, "noapproll%s" % mode, (0, 0, 1))
             if type(roll) is tuple:
                 self.noapp = Dice.D(*roll)
+        if type(self.morale) is tuple:
+            self.morale = str(Dice.D(*self.morale))
+        if type(self.hitdice) is tuple:
+            self.hitdice = Dice.D(*self.hitdice)
+            self.hitdiceroll = (self.hitdice, 8, 0)
+            self.hitdice = "%d%s" % (self.hitdice, "**"[:self.specialbonus])
+            saveas = self.saveas.split("by HD")
+            if len(saveas) > 1:
+                self.saveas = "%s%d%s" % (saveas[0], self.hitdiceroll[0], saveas[1])
+        if hasattr(self, "spellcaster") and self.spellcaster:
+            clas = self.spellcaster[0]
+            level = self.spellcaster[1]
+            if level == 0:
+                level = self.hitdiceroll[0]
+            if type(level) is tuple:
+                level = Dice.D(*level)
+            if self.spellcaster[1] == 0:
+                self.name = "%s Level %d" % (self.name, level)
+            else:
+                notes.append("Abilities of a %s of level %d" % (Adventurer.classnames[clas], level))
+            self.spellcaster = (clas, level)
+            self.spells = Spells.genspells(clas, level)
         for i in range(self.noapp):
             self.hitpoints.append(max(1, Dice.D(*self.hitdiceroll)))
         myequipment = getattr(self, "equipment", None)
@@ -87,6 +110,8 @@ class Monster(object):
                 self.equipment = ", ".join(filter(None, [ primary[2], secondary[2], myequipment ]))
             self.noattacks = "%s %s" % (self.baseattack, " or ".join(filter(None, [ primary[0], secondary[0] ])))
             self.damage = ", ".join(filter(None, [ self.basedamage, primary[1], secondary[1] ]))
+        if notes:
+            self.notes = notes
 
 
 trollkin_table = {
@@ -134,6 +159,16 @@ generators = {
     'trollwifelair': trollwifelair_generator,
 }
 
+breathtable = [ 0,
+    (1, 'Acid', 2),
+    (1, 'Cold', 1),
+    (1, 'Fire', 1),
+    (1, 'Heat', 1),
+    (1, 'Lightning', 2),
+    (1, 'Poison Gas', 0),
+    (1, 'Steam', 0),
+]
+
 
 def DragonCustomize(m):
 
@@ -142,6 +177,9 @@ def DragonCustomize(m):
     m.noattacks = []
     m.damage = []
     m.casting = 0
+    m.breathweaponshape = list(m.breathweaponshape)
+    m.breathweapon = ''
+    notes = []
 
     state = "main"
 
@@ -154,7 +192,8 @@ def DragonCustomize(m):
             state = "attacks"
 
         elif row[0] == "Hit Dice":
-            m.hitdice = row[m.agecategory]
+            m.hitdice = "%s%s" % (row[m.agecategory], "**"[:m.specialbonus])
+            m.saveas = "F%s" % row[m.agecategory]
 
         elif row[0] == "Hit Dice Roll":
             m.hitdiceroll = row[m.agecategory]
@@ -163,20 +202,30 @@ def DragonCustomize(m):
             m.attackbonus = row[m.agecategory]
 
         elif row[0] == "Breath Weapon":
-            m.breathweapon = row[1]
+            if m.agecategory > 1:
+                m.breathweapon = "%s Breath" % row[1]
+                if row[1] == "Special":
+                    typ = Dice.tableroller(breathtable)
+                    m.breathweaponshape[typ[2]] = 1
+                    m.breathweapon = "%s Breath" % typ[1]
+                    if m.agecategory >= 4:
+                        typ2 = Dice.tableroller(breathtable)
+                        m.breathweaponshape[typ2[2]] = 1
+                        m.breathweapon = "%s or %s Breath" % (typ[1], typ2[1])
 
         elif row[0] == "Length":
-            m.breathweapon = "%s %s" % (m.breathweapon, row[m.agecategory])
+            if m.agecategory > 1:
+                m.breathweaponlength = row[m.agecategory]
 
         elif row[0] == "Width":
-            m.breathweapon = "%s%s" % (m.breathweapon, row[m.agecategory])
+            if m.agecategory > 1:
+                m.breathweaponwidth = row[m.agecategory]
 
         elif row[0] == 'Chance of Talking':
             m.talking = Dice.D(1, 100, 0) <= row[m.agecategory]
-            if m.talking and m.agecategory > 1:
-                m.casting = Dice.D(1, 100, 0) <= row[m.agecategory]
-                if m.casting:
-                    m.spelllevels = []
+            m.casting = Dice.D(1, 100, 0) <= row[m.agecategory]
+            if m.casting:
+                m.spelllevels = []
 
         elif state == "spells" and m.casting:
             m.spelllevels.append(row[m.agecategory])
@@ -186,32 +235,83 @@ def DragonCustomize(m):
             if row[0] == "Claw":
                 no = 2
             m.noattacks.append("%d %s" % (no, row[0].lower()))
-            m.damage.append("%d %s" % (no, row[m.agecategory]))
+            m.damage.append("%s %s" % (row[m.agecategory], row[0].lower()))
+
+    if m.agecategory == 7:
+        m.breathweaponshape = [ 1, 1, 1 ]
+    elif m.agecategory == 6:
+        n = Dice.D(1, 2, 0)
+        for i in range(3):
+            if m.breathweaponshape[i] != 1:
+                if n == 1:
+                    m.breathweaponshape[i] = 1
+                    break
+                else:
+                    n -= 1
 
     m.noattacks = ", ".join(m.noattacks)
-    m.noattacks = "%s or 1 %s" % (m.noattacks, m.breathweapon)
 
-    m.damage.append("%dd8 %s" % (m.hitdiceroll[0], m.breathweapon))
+    if m.breathweapon:
+        shapes = []
+        if m.breathweaponshape[0] == 1: # cloud
+            shapes.append("cloud %sL x %sW" % (m.breathweaponwidth, m.breathweaponwidth))
+        if m.breathweaponshape[1] == 1: # cone
+            shapes.append("cone %sL x %sW" % (m.breathweaponlength, m.breathweaponwidth))
+        if m.breathweaponshape[2] == 1: # line
+            shapes.append("line %sL x 5'W" % m.breathweaponlength)
+        notes.append("Breath Weapon:  %s, %s" % (m.breathweapon, ", ".join(shapes)))
+        m.damage.append("%dd8 breath" % m.hitdiceroll[0])
+        m.noattacks = "%s or 1 %s" % (m.noattacks, m.breathweapon.lower())
+
     m.damage = ", ".join(m.damage)
+
+    if m.talking:
+        notes.append("Dragon speaks Common or other language(s)")
+
+    if m.casting:
+        m.spells = Spells.genspells(2, spelllevels = m.spelllevels)
+
+    m.hitpoints = []
+    for i in range(m.noapp):
+        m.hitpoints.append(Dice.D(*m.hitdiceroll))
+
+    if notes:
+        m.notes = notes
 
 
 def DragonFactory(prime, name, mode, agecategory = 0):
     
+    noapp = prime.noapp
+    prime.noapp = 1
+
     # regardless of mode, the prime dragon needs to be customized
+    # number appearing affects the spread
+
     if agecategory:
         prime.agecategory = agecategory
+    elif noapp > 2:
+        prime.agecategory = Dice.D(1, 4, 2)
     else:
         prime.agecategory = Dice.D(1, 6, 1)
+
     DragonCustomize(prime)
 
-    # reroll all hit points
+    if noapp == 1:
+        return [ prime ]
 
-    prime.hitpoints = []
-    for i in range(prime.noapp):
-        prime.hitpoints.append(max(1, Dice.D(*prime.hitdiceroll)))
+    # at this point we need at least the mate
+    secondary = Monster(name, "one")
+    secondary.agecategory = Dice.D(1, 4, 2)
+    DragonCustomize(secondary)
 
-    # fix later
-    return [ prime ]
+    if noapp > 2:
+        hatchling = Monster(name, "one")
+        hatchling.agecategory = 1
+        hatchling.noapp = noapp - 2
+        DragonCustomize(hatchling)
+        return [ prime, secondary, hatchling ]
+    else:
+        return [ prime, secondary ]
 
 
 def MonsterFactory(name, mode = "one"):

@@ -1,5 +1,5 @@
-# Basic Fantasy RPG Dungeoneer Suite
-# Copyright 2007-2024 Chris Gonnerman
+# Basic Fantasy RPG Dungeoneer Next Generation Suite
+# Copyright 2007-2025 Chris Gonnerman
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -235,18 +235,25 @@ scrolltable = [
     (3, 6),
 ]
 
+
 # returns a list of spells
 
-def genspells(clas, level):
+def genspells(clas, level = 0, spelllevels = None):
 
     if clas == 0:
+        tbl = clericspells
+    else:
+        tbl = magicuserspells
+
+    if spelllevels:
+        row = (0,) + tuple(spelllevels)
+    elif clas == 0:
         tbl = clericspells
         if level == 1:
             return None
         else:
             row = spellchart[level-1]
     else:
-        tbl = magicuserspells
         row = spellchart[level]
 
     spells = []
@@ -285,5 +292,6 @@ def genscroll(clas, number):
         scrollspells.append(random.choice(tbl[lvl]))
     scrollspells.sort()
     return scrollspells
+
 
 # end of file.
