@@ -31,7 +31,7 @@
 
 
 import random
-from . import Spells, Dice
+from . import Spells, Dice, Tables
 
 
 # *******************************************************************************************************
@@ -458,6 +458,8 @@ class Character:
         self.clas = clas
         self.classname = classnames[self.clas]
 
+        self.hitpoints = [ ]
+
         self.spells = None
 
         self.level = level
@@ -465,6 +467,8 @@ class Character:
             if Dice.D(1, 100) <= 30:
                 self.level = max(Dice.D(1, self.level), Dice.D(1, self.level))
             self.level = levels[self.level][clas]
+
+        self.attackbonus = Tables.characterab[self.level][self.clas]
 
         self.stats = [
             Dice.D(3, 6), Dice.D(3, 6), Dice.D(3, 6),
@@ -516,20 +520,28 @@ class Character:
         self.potion = ""
         self.scroll = ""
 
+        self.rollhp()
+
         if outfit:
             self.outfit()
         self.calc()
 
     def rollhp(self):
-        self.hp = 0
-        for i in range(min(self.level, 9)):
-            roll = Dice.D(1, hitdice[self.clas][0]) + statbonuses[self.stats[4]]
-            self.hp = self.hp + max(roll, 1)
-        if self.level > 9:
-            self.hp = self.hp + (hitdice[self.clas][1] * (self.level - 9))
+        self.hitpoints = []
+        for j in range(self.noapp):
+            hp = 0
+            for i in range(min(self.level, 9)):
+                roll = Dice.D(1, hitdice[self.clas][0]) + statbonuses[self.stats[4]]
+                hp = hp + max(roll, 1)
+            if self.level > 9:
+                hp = hp + (hitdice[self.clas][1] * (self.level - 9))
+            if self.noapp > 1:
+                self.hitpoints.append(hp)
+            else:
+                self.hitpoints = hp
 
     def calc(self):
-        self.ac = self.armorvalue + self.shieldvalue + statbonuses[self.stats[3]] + self.ringpro
+        self.armorclass = self.armorvalue + self.shieldvalue + statbonuses[self.stats[3]] + self.ringpro
 
     # generate items for an adventurer NPC
     def outfit(self):
@@ -564,34 +576,34 @@ class Character:
 
         res = []
 
-        if character.name:
-            res.append(character.name)
+        if self.name:
+            res.append(self.name)
         else:
-            res.append("%d " % character.noapp)
-        res.append("%s %s %d," % (character.race, character.classname, character.level))
-        res.append("AC %d," % character.ac)
-        if type(character.hp) is int:
-            res.append("HP %d," % character.hp)
-        res.append("#At 1, Dam %s\n" % character.damage)
-        res.append(statstring(character.stats))
-        if character.spells is not None:
+            res.append("%d " % self.noapp)
+        res.append("%s %s %d," % (self.race, self.classname, self.level))
+        res.append("AC %d," % self.armorclass)
+        res.append("AB %d," % self.attackbonus)
+        res.append("HP %s," % ", ".join(self.hitpoints))
+        res.append("#At 1, Dam %s\n" % self.damage)
+        res.append(statstring(self.stats))
+        if self.spells is not None:
             res.append("Spells:")
-            res.append(", ".join(character.spells))
+            res.append(", ".join(self.spells))
         items = []
-        if character.armor:
-            items.append(character.armor)
-        if character.shield:
-            items.append(character.shield)
-        items.append(character.meleeweapon)
-        if character.ringpro > 0:
-            items.append("ring of protection +%d" % character.ringpro)
-        if character.potion:
-            items.append("<b>potion of %s</b>" % character.potion)
-        if character.scroll:
-            if "scroll" in character.scroll:
-                items.append("<b>%s</b>" % character.scroll)
+        if self.armor:
+            items.append(self.armor)
+        if self.shield:
+            items.append(self.shield)
+        items.append(self.meleeweapon)
+        if self.ringpro > 0:
+            items.append("ring of protection +%d" % self.ringpro)
+        if self.potion:
+            items.append("<b>potion of %s</b>" % self.potion)
+        if self.scroll:
+            if "scroll" in self.scroll:
+                items.append("<b>%s</b>" % self.scroll)
             else:
-                items.append(character.scroll)
+                items.append(self.scroll)
         if items:
             res.append("<p class='MonsterBlock Body'>Equipment:")
         res.append(", ".join(items))
@@ -711,6 +723,100 @@ def generate(level):
         party.append(character)
 
     return party
+
+
+def htmlhitpointblock(hplst):
+
+    if type(hplst) is int:
+        hplst = [ hplst ]
+
+    rc = [ ]
+
+    for hp in hplst:
+
+        hprows = []
+
+        # hit point boxes
+        n = hp // 5
+        r = hp % 5
+
+        hprow = []
+        while n:
+            hprow.append("&#9744;" * 5)
+            n -= 1
+            if len(hprow) > 3:
+                hprows.append(" ".join(hprow))
+                hprow = []
+        if r:
+            hprow.append("&#9744;" * r)
+
+        if hprow:
+            hprows.append(" ".join(hprow))
+
+        if hprows:
+            hprows[0] = "".join([
+                "<tr><td style='width: 2em;'>HP</td>",
+                "<td style='width: 3em; text-align: right; padding-right: 1em;'>%d</td>" % hp,
+                "<td>%s</td></tr>" % hprows[0],
+            ])
+            for i in range(1, len(hprows)):
+                hprows[i] = "<tr><td></td><td></td><td>%s</td></tr>" % hprows[i]
+            hprows = [ "<table>\n%s\n</table>" % "\n".join(hprows) ]
+
+        rc.append("\n".join(hprows))
+
+    return "\n".join(rc)
+
+
+def htmlblock(character):
+
+    res = [ "<p>" ]
+
+    rcl = "%s %s %d" % (character.race, character.classname, character.level)
+    if character.name:
+        res.append("<b>%s</b>, %s:" % (character.name, rcl))
+    else:
+        res.append("<b>%d %s:</b>" % (character.noapp, rcl))
+    res.append("AC %d, AB +%d, #At 1, Dam %s, Mv %d', ML %d" 
+        % (character.armorclass, character.attackbonus, character.damage, character.movement, character.morale))
+    ss = statstring(character.stats, 1).strip()
+    if ss:
+        res.append("<p class='MonsterBlock'>%s" % ss)
+    if character.spells is not None:
+        res.append("<p class='MonsterBlock Body'>Spells:")
+        res.append("<b>%s</b>" % (", ".join(map(lambda s: s.lower(), character.spells))))
+    items = []
+    if character.armor:
+        items.append(character.armor)
+    if character.shield:
+        items.append(character.shield)
+    items.append(character.meleeweapon)
+    if character.ringpro > 0:
+        items.append("<b>ring of protection +%d</b>" % character.ringpro)
+    if character.potion:
+        items.append("<b>potion of %s</b>" % character.potion)
+    if character.scroll:
+        if "scroll" in character.scroll:
+            items.append("<b>%s</b>" % character.scroll)
+        else:
+            items.append(character.scroll)
+    if items:
+        res.append("<p class='MonsterBlock Body'>Equipment:")
+    res.append(", ".join(items))
+
+    res.append(htmlhitpointblock(character.hitpoints))
+
+    return "\n".join(res)
+
+    
+def htmlshowparty(party):
+
+    res = []
+
+    for character in party:
+        res.append(htmlblock(character))
+
+    return "\n".join(res)
 
 
 # end of file.

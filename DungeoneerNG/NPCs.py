@@ -1,5 +1,5 @@
-# Basic Fantasy RPG Dungeoneer Suite
-# Copyright 2007-2024 Chris Gonnerman
+# Basic Fantasy RPG Dungeoneer Next Generation Suite
+# Copyright 2007-2025 Chris Gonnerman
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -56,7 +56,7 @@ banditweapons = [
 
 class Bandit(Character):
 
-    def outfit(c, ldr):
+    def outfit(c, ldr = 0):
 
         if ldr:
             a = Dice.tableroller(banditarmor)
@@ -83,7 +83,7 @@ class Bandit(Character):
 
 class Pirate(Character):
 
-    def outfit(c, ldr):
+    def outfit(c, ldr = 0):
 
         a = Dice.tableroller(piratearmor)
         c.armor = a[1]
@@ -179,9 +179,9 @@ def bandits():
 
     for character in party:
         if character.noapp > 1:
-            character.hp = []
+            character.hitpoints = []
             for i in range(character.noapp):
-                character.hp.append(character.rollhp())
+                character.hitpoints.append(character.rollhp())
 
     return party
 
@@ -217,9 +217,9 @@ def pirates():
         character.name = ""
         character.noapp = min(nmooks, Dice.D(1, mooks))
         nmooks -= character.noapp
-        character.hp = []
+        character.hitpoints = []
         for i in range(character.noapp):
-            character.hp.append(character.rollhp())
+            character.hitpoints.append(character.rollhp())
         party.append(character)
 
     return party
@@ -230,13 +230,13 @@ def generate(typ):
         party = bandits()
     else:
         party = pirates()
-    return showparty(party)
+    return htmlshowparty(party)
 
 
 if __name__ == "__main__":
 
     party = bandits()
-    print(showparty(party))
+    print(htmlshowparty(party))
 
 
 # end of file.

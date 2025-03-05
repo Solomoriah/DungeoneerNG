@@ -31,9 +31,9 @@
 
 
 try:
-    from DungeoneerNG import _Monsters, Dice, Spells, Adventurer, XP
+    from DungeoneerNG import _Monsters, Dice, Spells, Adventurer, Tables, Treasure
 except:
-    import _Monsters, Dice, Spells, Adventurer, XP
+    import _Monsters, Dice, Spells, Adventurer, Tables, Treasure
 
 
 monsters = _Monsters.monsters
@@ -69,7 +69,7 @@ class Monster(object):
             saveas = self.saveas.split("by HD")
             if len(saveas) > 1:
                 self.saveas = "%s%d%s" % (saveas[0], self.hitdiceroll[0], saveas[1])
-            self.xp = str(XP.xpcalc(self.hitdice))
+            self.xp = str(Tables.xpcalc(self.hitdice))
         if hasattr(self, "spellcaster") and self.spellcaster:
             clas = self.spellcaster[0]
             level = self.spellcaster[1]
@@ -195,7 +195,7 @@ def DragonCustomize(m):
         elif row[0] == "Hit Dice":
             m.hitdice = "%s%s" % (row[m.agecategory], "**"[:m.specialbonus])
             m.saveas = "F%s" % row[m.agecategory]
-            m.xp = str(XP.xpcalc(m.hitdice))
+            m.xp = str(Tables.xpcalc(m.hitdice))
 
         elif row[0] == "Hit Dice Roll":
             m.hitdiceroll = row[m.agecategory]

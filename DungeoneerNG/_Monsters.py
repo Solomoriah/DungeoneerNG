@@ -166,6 +166,7 @@ monsters = {
         'saveas': 'Normal Man',
         'specialbonus': 0,
         'treasure': 'P, Q each; C, K in lair',
+        'personaltreasure': ('P', 'Q'),
         'xp': '10',
     },
     'Barkling Warrior': {
@@ -199,6 +200,7 @@ monsters = {
         'saveas': 'Fighter: 1',
         'specialbonus': 0,
         'treasure': 'P, Q each; C, K in lair',
+        'personaltreasure': ('P', 'Q'),
         'xp': '25',
     },
     'Barkling Chieftain': {
@@ -232,6 +234,7 @@ monsters = {
         'saveas': 'Fighter: 2',
         'specialbonus': 0,
         'treasure': 'P, Q each; C, K in lair',
+        'personaltreasure': ('P', 'Q'),
         'xp': '75',
     },
     'Barkling Lord': {
@@ -265,6 +268,7 @@ monsters = {
         'saveas': 'Fighter: 3',
         'specialbonus': 0,
         'treasure': 'P, Q each; C, K in lair',
+        'personaltreasure': ('P', 'Q'),
         'xp': '145',
     },
     'Barkling Wizard': {
@@ -297,7 +301,7 @@ monsters = {
         'saveas': 'Fighter: 1',
         'specialbonus': 0,
         'treasure': 'P, Q each; C, K in lair',
-# NTDN XP value needs to be calculated for this creature
+        'personaltreasure': ('P', 'Q'),
         'xp': '37',
     },
     'Basilisk, Common': {
@@ -817,6 +821,7 @@ monsters = {
         'saveas': 'Fighter: 3',
         'specialbonus': 0,
         'treasure': 'Q, R each; B, L, M in lair',
+        'personaltreasure': ('Q', 'R'),
         'xp': '145',
     },
     'Bugbear Warrior': {
@@ -846,6 +851,7 @@ monsters = {
         'saveas': 'Fighter: 4',
         'specialbonus': 0,
         'treasure': 'Q, R each; B, L, M in lair',
+        'personaltreasure': ('Q', 'R'),
         'xp': '240',
     },
     'Bugbear Chieftain': {
@@ -875,6 +881,7 @@ monsters = {
         'saveas': 'Fighter: 6',
         'specialbonus': 0,
         'treasure': 'Q, R each; B, L, M in lair',
+        'personaltreasure': ('Q', 'R'),
         'xp': '500',
     },
     'Bugbear Shaman': {
@@ -903,6 +910,7 @@ monsters = {
         'saveas': 'Fighter: 3',
         'specialbonus': 1,
         'treasure': 'Q, R each; B, L, M in lair',
+        'personaltreasure': ('Q', 'R'),
         'xp': '175',
     },
     'Caecilia, Giant': {
@@ -3038,6 +3046,7 @@ monsters = {
         'saveas': 'Fighter: 2',
         'specialbonus': 0,
         'treasure': 'Q, S each; D, K in lair',
+        'personaltreasure': ('Q', 'S'),
         'xp': '75',
     },
     'Gnoll Warrior': {
@@ -3068,6 +3077,7 @@ monsters = {
         'saveas': 'Fighter: 4',
         'specialbonus': 0,
         'treasure': 'Q, S each; D, K in lair',
+        'personaltreasure': ('Q', 'S'),
         'xp': '240',
     },
     'Gnoll Pack Leader': {
@@ -3098,6 +3108,7 @@ monsters = {
         'saveas': 'Fighter: 6',
         'specialbonus': 0,
         'treasure': 'Q, S each; D, K in lair',
+        'personaltreasure': ('Q', 'S'),
         'xp': '500',
     },
     'Gnoll Witch (or Warlock)': {
@@ -3127,6 +3138,7 @@ monsters = {
         'saveas': 'Magic-User: 2',
         'specialbonus': 1,
         'treasure': 'Q, S each; D, K in lair',
+        'personaltreasure': ('Q', 'S'),
         'xp': '75',
     },
     'Gnoll Shaman': {
@@ -3156,6 +3168,7 @@ monsters = {
         'saveas': 'Cleric: 4',
         'specialbonus': 1,
         'treasure': 'Q, S each; D, K in lair',
+        'personaltreasure': ('Q', 'S'),
         'xp': '240',
     },
     'Gnome': {
@@ -3403,6 +3416,7 @@ monsters = {
         'saveas': 'Fighter: 1',
         'specialbonus': 0,
         'treasure': 'R each; C in lair',
+        'personaltreasure': ('R',),
         'xp': '10',
     },
     'Goblin Shaman': {
@@ -4101,6 +4115,7 @@ monsters = {
         'saveas': 'Fighter: 1',
         'specialbonus': 0,
         'treasure': 'Q, R each; D, K in lair',
+        'personaltreasure': ('Q', 'R'),
         'xp': '25',
     },
     'Hobgoblin Warrior': {
@@ -4130,6 +4145,7 @@ monsters = {
         'saveas': 'Fighter: 3',
         'specialbonus': 0,
         'treasure': 'Q, R each; D, K in lair',
+        'personaltreasure': ('Q', 'R'),
         'xp': '145',
     },
     'Hobgoblin Chieftain': {
@@ -4159,6 +4175,7 @@ monsters = {
         'saveas': 'Fighter: 5',
         'specialbonus': 0,
         'treasure': 'Q, R each; D, K in lair',
+        'personaltreasure': ('Q', 'R'),
         'xp': '145',
     },
     'Hobgoblin King': {
@@ -4188,6 +4205,7 @@ monsters = {
         'saveas': 'Fighter: 7',
         'specialbonus': 0,
         'treasure': 'Q, R each; D, K in lair',
+        'personaltreasure': ('Q', 'R'),
         'xp': '670',
     },
     'Hobgoblin Shaman': {
@@ -4217,6 +4235,7 @@ monsters = {
         'saveas': 'Fighter: 3',
         'specialbonus': 1,
         'treasure': 'Q, R each; D, K in lair',
+        'personaltreasure': ('Q', 'R'),
         'xp': '175',
     },
     'Hobgoblin Witch (or Warlock)': {
@@ -4247,6 +4266,7 @@ monsters = {
         'saveas': 'Fighter: 1',
         'specialbonus': 1,
         'treasure': 'Q, R each; D, K in lair',
+        'personaltreasure': ('Q', 'R'),
         'xp': '37',
     },
     'Hydra, 5 Headed': {
@@ -4653,6 +4673,7 @@ monsters = {
         'saveas': 'Fighter: 2',
         'specialbonus': 1,
         'treasure': 'V',
+        'personaltreasure': ('V',),
         'xp': '280',
     },
     'Jelly, Gray (Gray Ooze)': {
@@ -4766,6 +4787,7 @@ monsters = {
         'saveas': 'Normal Man',
         'specialbonus': 0,
         'treasure': 'P, Q each; C in lair',
+        'personaltreasure': ('P', 'Q'),
         'xp': '10',
     },
     'Kobold Warrior': {
@@ -4799,6 +4821,7 @@ monsters = {
         'saveas': 'Fighter: 1',
         'specialbonus': 0,
         'treasure': 'P, Q each; C in lair',
+        'personaltreasure': ('P', 'Q'),
         'xp': '25',
     },
     'Kobold Chieftain': {
@@ -4835,6 +4858,7 @@ monsters = {
         'saveas': 'Fighter: 2',
         'specialbonus': 0,
         'treasure': 'P, Q each; C in lair',
+        'personaltreasure': ('P', 'Q'),
         'xp': '75',
     },
     'Kobold King': {
@@ -4871,6 +4895,7 @@ monsters = {
         'saveas': 'Fighter: 3',
         'specialbonus': 0,
         'treasure': 'P, Q each; C in lair',
+        'personaltreasure': ('P', 'Q'),
         'xp': '145',
     },
     'Kobold Shaman': {
@@ -4904,7 +4929,7 @@ monsters = {
         'saveas': 'Fighter: 1',
         'specialbonus': 1,
         'treasure': 'P, Q each; C in lair',
-# NTDN XP value needs to be calculated for this creature
+        'personaltreasure': ('P', 'Q'),
         'xp': '37',
     },
     'Leech, Giant': {
@@ -5642,6 +5667,7 @@ monsters = {
         'saveas': 'Fighter: 1',
         'specialbonus': 0,
         'treasure': 'Q, R each; D in lair',
+        'personaltreasure': ('Q', 'R'),
         'xp': '25',
     },
     'Orc Warrior': {
@@ -5663,6 +5689,7 @@ monsters = {
         'saveas': 'Fighter: 2',
         'specialbonus': 0,
         'treasure': 'Q, R each; D in lair',
+        'personaltreasure': ('Q', 'R'),
         'xp': '75',
     },
     'Orc Chieftain': {
@@ -5684,6 +5711,7 @@ monsters = {
         'saveas': 'Fighter: 4',
         'specialbonus': 0,
         'treasure': 'Q, R each; D in lair',
+        'personaltreasure': ('Q', 'R'),
         'xp': '240',
     },
     'Orc King': {
@@ -5705,6 +5733,7 @@ monsters = {
         'saveas': 'Fighter: 6',
         'specialbonus': 0,
         'treasure': 'Q, R each; D in lair',
+        'personaltreasure': ('Q', 'R'),
         'xp': '240',
     },
     'Orc Shaman': {
@@ -5726,6 +5755,7 @@ monsters = {
         'saveas': 'Fighter: 1',
         'specialbonus': 1,
         'treasure': 'Q, R each; D in lair',
+        'personaltreasure': ('Q', 'R'),
         'xp': '37',
     },
     'Ostrich': {
@@ -5877,6 +5907,7 @@ monsters = {
         'saveas': 'Fighter: 1 (with Elf bonuses)',
         'specialbonus': 1,
         'treasure': 'R, S',
+        'personaltreasure': ('R', 'S'),
         'xp': '37',
         'officialname': 'Pixie',
     },
@@ -6945,6 +6976,7 @@ monsters = {
         'saveas': 'Magic-User: 4 (with Elf bonuses)',
         'specialbonus': 1,
         'treasure': 'S',
+        'personaltreasure': ('S',),
         'xp': '13',
         'officialname': 'Sprite',
     },
@@ -7399,6 +7431,7 @@ monsters = {
         'saveas': 'Fighter: 2',
         'specialbonus': 1,
         'treasure': 'Q, R, S each; special in lair',
+        'personaltreasure': ('Q', 'R', 'S'),
         'xp': '100',
         'officialname': 'Urgoblin',
     },

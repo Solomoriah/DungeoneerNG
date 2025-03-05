@@ -62,10 +62,34 @@ xptable = {
     25: (9000, 325),
 }
 
+characterab = (
+    (0, 0, 0, 0),
+    (1, 1, 1, 1),
+    (1, 2, 1, 1),
+    (2, 2, 1, 2),
+    (2, 3, 2, 2),
+    (3, 4, 2, 3),
+    (3, 4, 3, 3),
+    (4, 5, 3, 4),
+    (4, 6, 3, 4),
+    (5, 6, 4, 5),
+    (5, 6, 4, 5),
+    (5, 7, 4, 5),
+    (6, 7, 4, 6),
+    (6, 8, 5, 6),
+    (6, 8, 5, 6),
+    (7, 8, 5, 7),
+    (7, 9, 6, 7),
+    (7, 9, 6, 7),
+    (8, 10, 6, 8),
+    (8, 10, 7, 8),
+    (8, 10, 7, 8),
+)
+
+
 # For monsters with more than 25 hit dice, add 750 XP
 # to the XP Value and 25 XP to the Special Ability Bonus
 # per additional hit die.
-
 
 def xpcalc(hitdice):
     hitdice = hitdice.split("(")[0]
