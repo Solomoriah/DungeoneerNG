@@ -31,9 +31,9 @@
 
 
 try:
-    from DungeoneerNG import _Monsters, Dice, Spells, Adventurer
+    from DungeoneerNG import _Monsters, Dice, Spells, Adventurer, XP
 except:
-    import _Monsters, Dice, Spells, Adventurer
+    import _Monsters, Dice, Spells, Adventurer, XP
 
 
 monsters = _Monsters.monsters
@@ -69,6 +69,7 @@ class Monster(object):
             saveas = self.saveas.split("by HD")
             if len(saveas) > 1:
                 self.saveas = "%s%d%s" % (saveas[0], self.hitdiceroll[0], saveas[1])
+            self.xp = str(XP.xpcalc(self.hitdice))
         if hasattr(self, "spellcaster") and self.spellcaster:
             clas = self.spellcaster[0]
             level = self.spellcaster[1]
@@ -194,6 +195,7 @@ def DragonCustomize(m):
         elif row[0] == "Hit Dice":
             m.hitdice = "%s%s" % (row[m.agecategory], "**"[:m.specialbonus])
             m.saveas = "F%s" % row[m.agecategory]
+            m.xp = str(XP.xpcalc(m.hitdice))
 
         elif row[0] == "Hit Dice Roll":
             m.hitdiceroll = row[m.agecategory]
@@ -266,7 +268,7 @@ def DragonCustomize(m):
     m.damage = ", ".join(m.damage)
 
     if m.talking:
-        notes.append("Dragon speaks Common or other language(s)")
+        notes.append("Speaks Common or other language(s)")
 
     if m.casting:
         m.spells = Spells.genspells(2, spelllevels = m.spelllevels)
@@ -280,7 +282,7 @@ def DragonCustomize(m):
 
 
 def DragonFactory(prime, name, mode, agecategory = 0):
-    
+
     noapp = prime.noapp
     prime.noapp = 1
 
@@ -289,6 +291,8 @@ def DragonFactory(prime, name, mode, agecategory = 0):
 
     if agecategory:
         prime.agecategory = agecategory
+    elif prime.name == "Dragon Turtle":
+        prime.agecategory = Dice.D(1, 7, 0)
     elif noapp > 2:
         prime.agecategory = Dice.D(1, 4, 2)
     else:
@@ -356,6 +360,7 @@ def MonsterFactory(name, mode = "one"):
     totalapp = prime.noapp
     rc = [ prime ]
 
+    leadermorale = None
     last_ldr = None
     for num_m, ldr_mode, ldr_single, ldr_name, ldr_odds in prime.leaders:
         if num_m and totalapp < num_m:
@@ -370,7 +375,20 @@ def MonsterFactory(name, mode = "one"):
                 nldr = totalapp // num_m
             prime.noapp -= nldr
             prime.hitpoints = prime.hitpoints[:prime.noapp]
-            rc.append(Monster(ldr_name, noapp = nldr))
+            leader = Monster(ldr_name, noapp = nldr)
+            if hasattr(leader, "leadermorale") and leader.leadermorale:
+                leadermorale = leader.morale
+                for m in rc:
+                    if hasattr(m, "fixedmorale") and m.fixedmorale:
+                        pass
+                    else:
+                        m.morale = leader.morale
+            elif leadermorale is not None:
+                if hasattr(leader, "fixedmorale") and leader.fixedmorale:
+                    pass
+                else:
+                    leader.morale = leadermorale
+            rc.append(leader)
 
     return rc
 
