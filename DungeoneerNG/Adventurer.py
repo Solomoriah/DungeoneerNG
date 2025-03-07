@@ -643,6 +643,51 @@ class Character:
 
         return "".join(odt)
 
+    def to_html(self):
+
+        res = [ "<p>" ]
+
+        rcl = "%s %s %d" % (self.race, self.classname, self.level)
+        if self.name:
+            res.append("<b>%s</b>, %s:" % (self.name, rcl))
+        else:
+            res.append("<b>%d %s:</b>" % (self.noapp, rcl))
+        xpea = ''
+        if self.noapp > 1:
+            xpea = ' ea.'
+        res.append("AC %d, AB +%d, #At 1 %s, Dam %s, Mv %d', ML %d, XP %d%s"
+            % (self.armorclass, self.attackbonus, self.meleeweapon.lower(),
+               self.damage, self.movement, self.morale, self.xp, xpea)
+        )
+        ss = statstring(self.stats, 1).strip()
+        if ss:
+            res.append("<p>%s" % ss)
+        if self.spells is not None:
+            res.append("<p>Spells:")
+            res.append("<b>%s</b>" % (", ".join(map(lambda s: s.lower(), self.spells))))
+        items = []
+        if self.armor:
+            items.append(self.armor)
+        if self.shield:
+            items.append(self.shield)
+        items.append(self.meleeweapon)
+        if self.ringpro > 0:
+            items.append("<b>ring of protection +%d</b>" % self.ringpro)
+        if self.potion:
+            items.append("<b>potion of %s</b>" % self.potion)
+        if self.scroll:
+            if "scroll" in self.scroll:
+                items.append("<b>%s</b>" % self.scroll)
+            else:
+                items.append(self.scroll)
+        if items:
+            res.append("<p>Equipment:")
+        res.append(", ".join(items))
+
+        res.append(htmlhitpointblock(self.hitpoints))
+
+        return "\n".join(res)
+
 
 def genmeleeweapon(cclass, level):
 
@@ -799,62 +844,6 @@ def htmlhitpointblock(hplst):
         rc.append("\n".join(hprows))
 
     return "\n".join(rc)
-
-
-def htmlblock(character):
-
-    res = [ "<p>" ]
-
-    rcl = "%s %s %d" % (character.race, character.classname, character.level)
-    if character.name:
-        res.append("<b>%s</b>, %s:" % (character.name, rcl))
-    else:
-        res.append("<b>%d %s:</b>" % (character.noapp, rcl))
-    xpea = ''
-    if character.noapp > 1:
-        xpea = ' ea.'
-    res.append("AC %d, AB +%d, #At 1 %s, Dam %s, Mv %d', ML %d, XP %d%s" 
-        % (character.armorclass, character.attackbonus, character.meleeweapon.lower(),
-           character.damage, character.movement, character.morale, character.xp, xpea)
-    )
-    ss = statstring(character.stats, 1).strip()
-    if ss:
-        res.append("<p class='MonsterBlock'>%s" % ss)
-    if character.spells is not None:
-        res.append("<p class='MonsterBlock Body'>Spells:")
-        res.append("<b>%s</b>" % (", ".join(map(lambda s: s.lower(), character.spells))))
-    items = []
-    if character.armor:
-        items.append(character.armor)
-    if character.shield:
-        items.append(character.shield)
-    items.append(character.meleeweapon)
-    if character.ringpro > 0:
-        items.append("<b>ring of protection +%d</b>" % character.ringpro)
-    if character.potion:
-        items.append("<b>potion of %s</b>" % character.potion)
-    if character.scroll:
-        if "scroll" in character.scroll:
-            items.append("<b>%s</b>" % character.scroll)
-        else:
-            items.append(character.scroll)
-    if items:
-        res.append("<p class='MonsterBlock Body'>Equipment:")
-    res.append(", ".join(items))
-
-    res.append(htmlhitpointblock(character.hitpoints))
-
-    return "\n".join(res)
-
-    
-def htmlshowparty(party):
-
-    res = []
-
-    for character in party:
-        res.append(htmlblock(character))
-
-    return "\n".join(res)
 
 
 # end of file.

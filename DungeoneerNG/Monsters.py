@@ -30,10 +30,7 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-try:
-    from DungeoneerNG import _Monsters, Dice, Spells, Adventurer, Tables, Treasure
-except:
-    import _Monsters, Dice, Spells, Adventurer, Tables, Treasure
+from . import _Monsters, Dice, Spells, Adventurer, Tables, Treasure, ODT
 
 
 monsters = _Monsters.monsters
@@ -113,6 +110,77 @@ class Monster(object):
             self.damage = ", ".join(filter(None, [ self.basedamage, primary[1], secondary[1] ]))
         if notes:
             self.notes = notes
+
+    def to_html(self):
+
+        rc = []
+
+        ea = ""
+        if self.noapp > 1:
+            rc.append("<p><b>%s %s:</b> " % (self.noapp, self.names))
+            ea = " ea."
+        else:
+            rc.append("<p><b>%s:</b> " % self.name)
+
+        rc.append("AC %s, HD %s, #At %s, Dam %s, Mv %s, "
+            % (self.armorclass, self.hitdice, self.noattacks, self.damage, self.movement))
+        rc.append("Sv %s, ML %s, XP %s%s" % (self.saveasshort, self.morale, self.xp, ea))
+
+        rc = [ "".join(rc) ]
+
+        if hasattr(self, "notes") and self.notes:
+            for n in self.notes:
+                rc.append("<i>%s</i>" % n)
+
+        if hasattr(self, "spells") and self.spells:
+            rc.append("Spells: %s" % (", ".join(map(lambda s: "<b>%s</b>" % s.lower(), self.spells))))
+
+        if self.equipment:
+            rc.append("Equipment: %s" % self.equipment)
+
+        for i in range(len(self.hpblocks)):
+            rc.append(self.hpblocks[i])
+
+        return "<p>".join(rc)
+
+    def to_odt(self):
+
+        mblock = []
+        ea = ""
+        if self.noapp > 1:
+            mblock.append(ODT.bold("%s %s:") % (self.noapp, self.names))
+            ea = " ea."
+        else:
+            mblock.append(ODT.bold("%s:" % self.name))
+
+        mblock.append(ODT.nonbreak("AC %s," % self.armorclass))
+        mblock.append(ODT.nonbreak("HD %s," % self.hitdice))
+        mblock.append(ODT.nonbreak("#At %s," % self.noattacks))
+        mblock.append(ODT.nonbreak("Dam %s," % self.damage))
+        mblock.append(ODT.nonbreak("Mv %s," % self.movement))
+        mblock.append(ODT.nonbreak("Sv %s," % self.saveasshort))
+        mblock.append(ODT.nonbreak("ML %s," % self.morale))
+        mblock.append(ODT.nonbreak("XP %s%s" % (self.xp, ea)))
+
+        odt = [ ODT.monsterblock(" ".join(mblock)) ]
+
+        if hasattr(self, "notes") and self.notes:
+            for n in self.notes:
+                odt.append(ODT.monsterblock(ODT.italic("%s" % n)))
+
+        if hasattr(self, "spells") and self.spells:
+            odt.append(ODT.monsterblock("Spells: %s" % (", ".join(map(lambda s: ODT.bold(s.lower()), self.spells)))))
+
+        if self.equipment:
+            odt.append(ODT.monsterblock("Equipment: %s" % self.equipment))
+
+        for i in range(len(self.hpblocks)-1):
+            odt.append(ODT.hpcheckboxes(ODT.tab.join(self.hpblocks[i].split('\t'))))
+        if self.hpblocks:
+            odt.append(ODT.hpchecksend(ODT.tab.join(self.hpblocks[-1].split('\t'))))
+
+        return "".join(odt)
+
 
 
 trollkin_table = {
