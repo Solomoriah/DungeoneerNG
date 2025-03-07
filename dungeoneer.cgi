@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 
-# Basic Fantasy RPG Dungeoneer Suite
-# Copyright 2007-2024 Chris Gonnerman
+# Basic Fantasy RPG Dungeoneer Next Generation Suite
+# Copyright 2007-2025 Chris Gonnerman
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -34,8 +34,8 @@
 
 import os, sys
 
-sys.path.append("/home/newcent/lib/python2.3")
-import makesite
+#sys.stderr = sys.stdout
+#sys.stdout.write("Content-type: text/plain\n")
 
 sys.path.append(".")
 from Dungeoneer import Treasure, Dice, Stocker
@@ -52,13 +52,13 @@ try:
     # generate the dungeon
 
     fields = {}
-    for i in os.environ["QUERY_STRING"].split("&"):
+    for i in str(os.environ["QUERY_STRING"]).split("&"):
         key, value = i.split("=", 1)
         fields[key] = value
 
-    level = max(safeint(fields["level"], 1), 1)
-    first = max(safeint(fields["first"], 1), 1)
-    rooms = max(safeint(fields["rooms"], 1), 1)
+    level = max(safeint(fields.get("level", 1), 1), 1)
+    first = max(safeint(fields.get("first", 1), 1), 1)
+    rooms = max(safeint(fields.get("rooms", 1), 1), 1)
 
     body = Stocker.makedungeon(level, rooms, first)
 

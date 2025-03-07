@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 
-# Basic Fantasy RPG Dungeoneer Suite
-# Copyright 2007-2024 Chris Gonnerman
+# Basic Fantasy RPG Dungeoneer Next Generation Suite
+# Copyright 2007-2012, 2024-2025 Chris Gonnerman
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -36,10 +36,9 @@ import cgi, time, traceback, sys
 
 try:
 
-    sys.path.append("/home/newcent/lib/python2.3")
     sys.path.append(".")
 
-    from Dungeoneer import Adventurer
+    from DungeoneerNG import Adventurer, ODT
 
     form = cgi.FieldStorage()
 
@@ -50,17 +49,35 @@ try:
 
     level = min(10, max(1, level))
 
-    txt = Adventurer.generate(level)
+    party = Adventurer.generate(level)
 
-    print("Content-type: text/html\n")
+    odt = []
+    for chr in party:
+        odt.append(chr.to_odt())
+    odt = "".join(odt)
 
-    print(txt)
+    fn = ODT.saveodt(odt, stem = "adv",
+        savedir = "DNGdata",
+        defcontent = "DungeoneerNG/content.static",
+        base = "DungeoneerNG/base.odt")
+
+    sys.stdout.write("Content-type: text/html\n\n")
+
+    myid = "div%f" % time.time()
+    print("<div class=npcblock id='%s'>" % myid)
+    print("<div style='float: right;'>")
+    print("""<button class=redbutton onclick='$("%s").remove();'>X</button>""" % myid)
+    print("</div>")
+    for chr in party:
+        sys.stdout.write(chr.to_html())
+    print("<p><a href='%s'>Download</a>" % fn)
+    print("</div>")
 
 except:
-    print("Content-type: text/plain\n")
-    print("<pre>")
+    sys.stdout.write("Content-type: text/plain\n\n")
+    sys.stdout.write("<pre>\n")
     traceback.print_exc(file = sys.stdout)
-    print("</pre>")
+    sys.stdout.write("</pre>\n")
 
 
 # end of file.

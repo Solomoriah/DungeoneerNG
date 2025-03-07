@@ -37,17 +37,18 @@ import cgi, time, traceback, sys, html
 
 def run():
 
+#    sys.stderr = sys.stdout
+#    print("Content-type: text/plain\n")
+
     myid = "div%f" % time.time()
 
     sys.path.append(".")
 
-    from Dungeoneer import Treasure
+    from DungeoneerNG import Treasure
 
     form = cgi.FieldStorage()
-    treasuretype = form.getfirst("treasuretype", None)
-    if not treasuretype:
-        print("Content-type: text/html\n")
-        sys.exit(0)
+
+    treasuretype = form.getfirst("treasuretype", "")
 
     types = treasuretype.split()
     typestr = ", ".join(types).upper()
@@ -56,12 +57,17 @@ def run():
         typ = "Types"
 
     totval = 0
-    typenames, tr = Treasure.Factory(tuple(types))
+
+    tr = Treasure.Treasure()
+    typenames = []
+    for t in types:
+        tr.generate(t)
+        typenames.append(t.upper())
 
     body = [
         "<table>",
         "<thead>",
-        "<tr><td colspan=4><b>Treasure %s %s</b></td>" % (typ, typenames),
+        "<tr><td colspan=4><b>Treasure %s</b></td>" % ", ".join(typenames),
         "<td>",
         """<button class=redbutton onclick='$("%s").remove();'>X</button>""" % myid,
         "</td></tr>",
@@ -95,39 +101,7 @@ def run():
     body.append("</table>")
 
     body.append("<p>")
-
-    rc = []
-    for t in tr:
-        article = "a"
-        if t.shortname[0].lower() in "aeiou":
-            article = "an"
-        t.textvalue = "{:,.0f}".format(t.value)
-        t.textqty = "{:,.0f}".format(t.qty)
-        if t.cat == "Magic":
-            if t.qty > 1:
-                rc.append("%s <b>%s</b>" % (t.textqty, t.shortname.lower()))
-            else:
-                rc.append("%s <b>%s</b>" % (article, t.shortname.lower()))
-        elif t.cat == "Coin":
-            rc.append("%s %s" % (t.textqty, t.shortname.lower()))
-        elif t.value > 0:
-            if t.qty == 1:
-                rc.append("%s %s (worth %s gp)" % (article, t.shortname.lower(), t.textvalue))
-            else:
-                rc.append("%s %s (worth %s gp)" % (t.textqty, t.shortname.lower(), t.textvalue))
-        else:
-            rc.append("%s %s" % (t.textqty, t.shortname.lower()))
-
-    if len(rc) > 2:
-        rce = rc[-1]
-        rc = rc[:-1]
-        body.append("%s, and %s" % (", ".join(rc), rce))
-    elif len(rc) == 2:
-        body.append("%s and %s" % tuple(rc))
-    elif len(rc) == 1:
-        body.append(rc[0])
-    else:
-        body.append("(nothing)")
+    body.append(tr.to_html())
 
     block = "\n".join([
         "<div class=treasureblock id='%s'>" % myid,
@@ -137,7 +111,6 @@ def run():
 
     print("Content-type: text/html\n")
     print(block)
-
 
 
 if __name__ == "__main__":

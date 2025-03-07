@@ -33,25 +33,10 @@
 #  Treasure.py -- generate treasures for Basic Fantasy RPG
 ###############################################################################
 
-from . import Gems, Art, Coins, Magic, Unknown, Dice
 
+from . import Gems, Art, Coins, Magic, Unknown, Dice, ODT
 
-def combine(lst):
-    lst.sort()
-    hits = 1
-    while hits:
-        hits = 0
-        for i in range(len(lst) - 1):
-            if lst[i] is not None and lst[i+1] is not None:
-                if lst[i].cat == lst[i+1].cat \
-                and lst[i].name == lst[i+1].name \
-                and lst[i].value == lst[i+1].value:
-                    lst[i].qty += lst[i+1].qty
-                    lst[i+1] = None
-                    hits += 1
-        if hits:
-            lst = list(filter(lambda x: x is not None, lst))
-    return lst
+from collections import UserList
 
 
 def _gen_coins(argtup):
@@ -380,6 +365,7 @@ _treasure_table['U5'] = _treasure_table['U45']
 _treasure_table['U6'] = _treasure_table['U67']
 _treasure_table['U7'] = _treasure_table['U67']
 
+
 def Types():
     types = _treasure_table.keys()
     ones = list(filter(lambda x: len(x) == 1, types))
@@ -389,78 +375,79 @@ def Types():
     return ones + mults
 
 
-def Treasure(typ):
-    tr = []
-    typ = typ.upper()
-    if typ in _treasure_table:
-        tbl = _treasure_table[typ.upper()]
-        for i in tbl:
-            if Dice.D(1, 100, 0) <= i[0]:
-                tr = tr + i[1](i[2])
-    else:
-        tr = [ Unknown.Unknown(typ) ]
-    return tr
+class Treasure(UserList):
 
-
-def Factory(args):
-
-    types = []
-    tr = []
-
-    mult = 1
-
-    for i in args:
-        if type(i) is tuple:
-            i = Dice.D(*i)
-        try:
-            nmult = int(i)
-            mult = nmult
-            types.append("%d" % mult)
-            continue
-        except:
-            pass
-        types.append(i + ",")
-        for n in range(mult):
-            tr += Treasure(i)
-
-    types = " ".join(types)
-
-    if types[-1] == ',':
-        types = types[:-1]
-
-    return (types.upper(), combine(tr))
-
-
-if __name__ == "__main__":
-    import sys
-
-    if len(sys.argv) < 2:
-        print("Usage:  Treasure.py treasuretype [ treasuretype ... ]")
-        sys.exit(0)
-
-    types, tr = Factory(sys.argv[1:])
-
-    print("Treasure Type " + types.upper())
-
-    vtot = 0.0
-    ocat = ''
-    qty_len = 1
-    for t in tr:
-        qty_len = max(len(str(t.qty)), qty_len)
-    qty_fmt = "%" + str(qty_len) + "d"
-    for t in tr:
-        if t.cat != ocat:
-            print(t.cat)
-        ocat = t.cat
-        if t.value != 0:
-            print("   ", qty_fmt % t.qty, t.name, t.value, "GP ea.",
-                t.value * t.qty, "GP total")
+    def __init__(self, init = None):
+        self.category = "treasure"
+        self.treasuretypes = []
+        if init is None:
+            self.data = []
         else:
-            print("   ", qty_fmt % t.qty, t.name)
-        for i in t.desc:
-            print("       ", i)
-        vtot = vtot + (t.qty * t.value)
-    print("----- Total Value", vtot, "GP\n")
+            self.data = init
+
+    def generate(self, typ):
+        typ = typ.upper()
+        self.treasuretypes.append(typ)
+        if typ in _treasure_table:
+            tbl = _treasure_table[typ]
+            for i in tbl:
+                if Dice.D(1, 100, 0) <= i[0]:
+                    self.extend(i[1](i[2]))
+        else:
+            self.append(Unknown.Unknown(typ))
+        self.combine()
+
+    def combine(self):
+        self.data = sorted(self.data)
+        hits = 1
+        while hits:
+            hits = 0
+            for i in range(len(self.data) - 1):
+                if self[i] is not None and self[i+1] is not None:
+                    if self[i].cat == self[i+1].cat \
+                    and self[i].name == self[i+1].name \
+                    and self[i].value == self[i+1].value:
+                        self[i].qty += self[i+1].qty
+                        self[i+1] = None
+                        hits += 1
+            if hits:
+                self.data = list(filter(lambda x: x is not None, self.data))
+
+    def to_html(self):
+
+        rc = []
+
+        for t in self.data:
+            article = "a"
+            if t.shortname[0].lower() in "aeiou":
+                article = "an"
+            t.textvalue = "{:,.0f}".format(t.value)
+            t.textqty = "{:,.0f}".format(t.qty)
+            if t.cat == "Magic":
+                if t.qty > 1:
+                    rc.append("%s <b>%s</b>" % (t.textqty, t.shortname.lower()))
+                else:
+                    rc.append("%s <b>%s</b>" % (article, t.shortname.lower()))
+            elif t.cat == "Coin":
+                rc.append("%s %s" % (t.textqty, t.shortname.lower()))
+            elif t.value > 0:
+                if t.qty == 1:
+                    rc.append("%s %s (worth %s gp)" % (article, t.shortname.lower(), t.textvalue))
+                else:
+                    rc.append("%s %s (worth %s gp)" % (t.textqty, t.shortname.lower(), t.textvalue))
+            else:
+                rc.append("%s %s" % (t.textqty, t.shortname.lower()))
+
+        if len(rc) < 3:
+            return "Treasure: %s" % " and ".join(rc)
+
+        if len(rc) > 0:
+            return "Treasure: %s, and %s" % (", ".join(rc[:-1]), rc[-1])
+
+        return "Treasure: (nothing)"
+
+    def to_odt(self):
+        return ODT.textbody(ODT.fixbold(self.to_html()))
 
 
 # end of script.

@@ -52,12 +52,21 @@ def nonbreak(s):
     return nbsp.join(s.split(' '))
 
 
+def fixbold(s):
+    s = '<text:span text:style-name="T1">'.join(s.split("<b>"))
+    return '</text:span>'.join(s.split("</b>"))
+
+
 def bold(s):
     return '''<text:span text:style-name="T1">%s</text:span>''' % s
 
 
 def italic(s):
     return '''<text:span text:style-name="T2">%s</text:span>''' % s
+
+
+def textbody(s):
+    return '''<text:p text:style-name="Text Body">%s</text:p>''' % s
 
 
 def hpcheckboxes(s):

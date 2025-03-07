@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 
-# Basic Fantasy RPG Dungeoneer Suite
+# Basic Fantasy RPG Dungeoneer Next Generation Suite
 # Copyright 2007-2025 Chris Gonnerman
 # All rights reserved.
 #
@@ -34,12 +34,12 @@
 
 import cgi, time, traceback, sys
 
+
 try:
 
-    sys.path.append("/home/newcent/lib/python2.3")
     sys.path.append(".")
 
-    from DungeoneerNG import Adventurer
+    from DungeoneerNG import Adventurer, ODT
 
     form = cgi.FieldStorage()
 
@@ -53,12 +53,25 @@ try:
     except:
         klass = 0
 
+    myid = "div%f" % time.time()
     chr = Adventurer.Character(level, klass, actuallevel = 1)
+
+    odt = chr.to_odt()
+
+    fn = ODT.saveodt(odt, stem = "one",
+        savedir = "DNGdata",
+        defcontent = "DungeoneerNG/content.static",
+        base = "DungeoneerNG/base.odt")
 
     print("Content-type: text/html\n")
 
-    print(Adventurer.htmlshowparty([ chr ]))
-
+    print("<div class=npcblock id='%s'>" % myid)
+    print("<div style='float: right;'>")
+    print("""<button class=redbutton onclick='$("%s").remove();'>X</button>""" % myid)
+    print("</div>")
+    sys.stdout.write(chr.to_html())
+    print("<p><a href='%s'>Download</a>" % fn)
+    print("</div>")
 
 except:
     print("Content-type: text/plain\n")

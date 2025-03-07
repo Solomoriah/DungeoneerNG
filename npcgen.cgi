@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 
-# Basic Fantasy RPG Dungeoneer Suite
-# Copyright 2007-2024 Chris Gonnerman
+# Basic Fantasy RPG Dungeoneer Next Generation Suite
+# Copyright 2007-2025 Chris Gonnerman
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -32,27 +32,45 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-import cgi, time, traceback, sys, os
+import cgi, time, traceback, sys
 
 try:
 
-    sys.path.append("/home/newcent/lib/python2.3")
     sys.path.append(".")
 
-    from Dungeoneer import NPCs
+    from DungeoneerNG import NPCs, Adventurer, ODT
 
     form = cgi.FieldStorage()
 
-    txt = NPCs.generate(form.getfirst("type", "b"))
+    party = NPCs.generate(form.getfirst("type", "b"))
+
+    odt = []
+    for chr in party:
+        odt.append(chr.to_odt())
+    odt = "".join(odt)
+
+    fn = ODT.saveodt(odt, stem = "npc",
+        savedir = "DNGdata",
+        defcontent = "DungeoneerNG/content.static",
+        base = "DungeoneerNG/base.odt")
 
     print("Content-type: text/html\n")
 
-    print(txt)
+    myid = "div%f" % time.time()
+    print("<div class=npcblock id='%s'>" % myid)
+    print("<div style='float: right;'>")
+    print("""<button class=redbutton onclick='$("%s").remove();'>X</button>""" % myid)
+    print("</div>")
+    for chr in party:
+        sys.stdout.write(chr.to_html())
+    print("<p><a href='%s'>Download</a>" % fn)
+    print("</div>")
 
 except:
     print("Content-type: text/plain\n")
     print("<pre>")
     traceback.print_exc(file = sys.stdout)
     print("</pre>")
+
 
 # end of file.
