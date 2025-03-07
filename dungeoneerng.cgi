@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 
-# Basic Fantasy RPG Dungeoneer Next Generation Suite
+# Basic Fantasy RPG Dungeoneer Suite
 # Copyright 2007-2025 Chris Gonnerman
 # All rights reserved.
 #
@@ -32,13 +32,13 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-import os, sys
+import os, sys, cgi
 
-#sys.stderr = sys.stdout
-#sys.stdout.write("Content-type: text/plain\n")
+sys.stderr = sys.stdout
+sys.stdout.write("Content-type: text/plain\n")
 
 sys.path.append(".")
-from Dungeoneer import Treasure, Dice, Stocker
+from DungeoneerNG import Stocker, ODT
 
 sys.stderr = sys.stdout
 
@@ -51,19 +51,23 @@ def safeint(s, b):
 try:
     # generate the dungeon
 
-    fields = {}
-    for i in str(os.environ["QUERY_STRING"]).split("&"):
-        key, value = i.split("=", 1)
-        fields[key] = value
+    form = cgi.FieldStorage()
 
-    level = max(safeint(fields.get("level", 1), 1), 1)
-    first = max(safeint(fields.get("first", 1), 1), 1)
-    rooms = max(safeint(fields.get("rooms", 1), 1), 1)
+    level = safeint(form.getfirst("level", 1), 1)
+    first = safeint(form.getfirst("first", 1), 1)
+    rooms = safeint(form.getfirst("rooms", 1), 1)
 
-    body = Stocker.makedungeon(level, rooms, first)
+    dungeon = Stocker.DungeonFactory(level, rooms, first)
+
+    odt = "".join(map(lambda o: o.to_odt(), dungeon))
+
+    fn = ODT.saveodt(odt, stem = "dng",
+        savedir = "DNGdata",
+        defcontent = "DungeoneerNG/content.static",
+        base = "DungeoneerNG/base.odt")
 
     print("Content-type: text/html\n")
-    print(body)
+    print("\n".join(map(lambda o: o.to_html(), dungeon)))
     
 except:
 

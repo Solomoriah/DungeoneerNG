@@ -65,6 +65,10 @@ def italic(s):
     return '''<text:span text:style-name="T2">%s</text:span>''' % s
 
 
+def genericparagraph(s, style = "Text Body"):
+    return '''<text:p text:style-name="%s">%s</text:p>''' % (style, s)
+
+
 def textbody(s):
     return '''<text:p text:style-name="Text Body">%s</text:p>''' % s
 

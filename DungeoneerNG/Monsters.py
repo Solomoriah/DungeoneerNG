@@ -30,7 +30,7 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-from . import _Monsters, Dice, Spells, Adventurer, Tables, Treasure, ODT
+from . import _Monsters, Dice, Spells, Adventurer, Tables, Treasure, ODT, Formatter
 
 
 monsters = _Monsters.monsters
@@ -67,6 +67,16 @@ class Monster(object):
             if len(saveas) > 1:
                 self.saveas = "%s%d%s" % (saveas[0], self.hitdiceroll[0], saveas[1])
             self.xp = str(Tables.xpcalc(self.hitdice))
+        # condense the save as line
+        slst = self.saveas.split(": ")
+        if len(slst) > 1:
+            slst[0] = slst[0][0]
+            self.saveasshort = "".join(slst)
+        elif self.saveas == "Normal Man":
+            self.saveasshort = "NM"
+        else:
+            self.saveasshort = self.saveas
+        # deal with spell casters
         if hasattr(self, "spellcaster") and self.spellcaster:
             clas = self.spellcaster[0]
             level = self.spellcaster[1]
@@ -111,6 +121,21 @@ class Monster(object):
         if notes:
             self.notes = notes
 
+    def hitpointblocks(self, doit = 0):
+        if not doit and getattr(self, "hpblocks", None) is not None:
+            return
+        hponce = "HP"
+        self.hpblocks = []
+        for hp in self.hitpoints:
+            n = min(20, hp)
+            rhp = hp - n
+            self.hpblocks.append("%s\t%d\t%s" % (hponce, hp, Formatter.checkline(n)))
+            hponce = ""
+            while rhp:
+                n = min(20, rhp)
+                rhp -= n
+                self.hpblocks.append("\t\t%s" % (Formatter.checkline(n)))
+
     def to_html(self):
 
         rc = []
@@ -135,9 +160,10 @@ class Monster(object):
         if hasattr(self, "spells") and self.spells:
             rc.append("Spells: %s" % (", ".join(map(lambda s: "<b>%s</b>" % s.lower(), self.spells))))
 
-        if self.equipment:
+        if hasattr(self, "equipment") and self.equipment:
             rc.append("Equipment: %s" % self.equipment)
 
+        self.hitpointblocks() # in case we haven't already done this.
         for i in range(len(self.hpblocks)):
             rc.append(self.hpblocks[i])
 
@@ -171,9 +197,10 @@ class Monster(object):
         if hasattr(self, "spells") and self.spells:
             odt.append(ODT.monsterblock("Spells: %s" % (", ".join(map(lambda s: ODT.bold(s.lower()), self.spells)))))
 
-        if self.equipment:
+        if hasattr(self, "equipment") and self.equipment:
             odt.append(ODT.monsterblock("Equipment: %s" % self.equipment))
 
+        self.hitpointblocks() # in case we haven't already done this.
         for i in range(len(self.hpblocks)-1):
             odt.append(ODT.hpcheckboxes(ODT.tab.join(self.hpblocks[i].split('\t'))))
         if self.hpblocks:
@@ -262,7 +289,7 @@ def DragonCustomize(m):
 
         elif row[0] == "Hit Dice":
             m.hitdice = "%s%s" % (row[m.agecategory], "**"[:m.specialbonus])
-            m.saveas = "F%s" % row[m.agecategory]
+            m.saveas = "Fighter: %s" % row[m.agecategory]
             m.xp = str(Tables.xpcalc(m.hitdice))
 
         elif row[0] == "Hit Dice Roll":

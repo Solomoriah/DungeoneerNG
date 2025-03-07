@@ -68,4 +68,18 @@ def fixbold(s):
     return ODT.bold(ODT.nonbreak(s))
 
 
+class Paragraph:
+
+    def __init__(self, text, style = "Text Body"):
+        self.category = "paragraph"
+        self.text = text
+        self.style = style
+
+    def to_odt(self):
+        return ODT.genericparagraph(fixbold(self.text), self.style)
+
+    def to_html(self):
+        return "<p>\n%s" % self.text
+
+
 # end of file.

@@ -35,16 +35,6 @@
 import cgi, time, traceback, sys, json
 
 
-__checkbox = "&#9744;"
-__hpblock = __checkbox * 5
-
-
-def checkline(n):
-    blks = n // 5
-    remn = n % 5
-    return " ".join(([ __hpblock ] * blks) + [ __checkbox * remn ])
-
-
 try:
     sys.path.append(".")
     from DungeoneerNG import Monsters, ODT
@@ -67,29 +57,7 @@ try:
 
     for m in mlst:
 
-        # condense the save as line
-        slst = m.saveas.split(": ")
-        if len(slst) > 1:
-            slst[0] = slst[0][0]
-            m.saveasshort = "".join(slst)
-        elif m.saveas == "Normal Man":
-            m.saveasshort = "NM"
-        else:
-            m.saveasshort = m.saveas
-
         m.equipment = getattr(m, "equipment", "")
-
-        hponce = "HP"
-        m.hpblocks = []
-        for hp in m.hitpoints:
-            n = min(20, hp)
-            rhp = hp - n
-            m.hpblocks.append("%s\t%d\t%s" % (hponce, hp, checkline(n)))
-            hponce = ""
-            while rhp:
-                n = min(20, rhp)
-                rhp -= n
-                m.hpblocks.append("\t\t%s" % (checkline(n)))
 
         odt.append(m.to_odt())
         allrc.append(m.to_html())
