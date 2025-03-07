@@ -1,7 +1,5 @@
-#!/usr/bin/python3
-
-# Basic Fantasy RPG Dungeoneer Suite
-# Copyright 2007-2025 Chris Gonnerman
+# ODT Generator for Basic Fantasy Dungeoneer Suite
+# Copyright 2025 Chris Gonnerman
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -32,39 +30,42 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-import cgi, time, traceback, sys
-
-try:
-
-    sys.path.append("/home/newcent/lib/python2.3")
-    sys.path.append(".")
-
-    from DungeoneerNG import Adventurer
-
-    form = cgi.FieldStorage()
-
-    try:
-        level = int(form.getfirst("level", "1"))
-    except:
-        level = 1
-
-    try:
-        klass = int(form.getfirst("class", "0"))
-    except:
-        klass = 0
-
-    chr = Adventurer.Character(level, klass, actuallevel = 1)
-
-    print("Content-type: text/html\n")
-
-    print(Adventurer.htmlshowparty([ chr ]))
+from . import ODT, Adventurer
 
 
-except:
-    print("Content-type: text/plain\n")
-    print("<pre>")
-    traceback.print_exc(file = sys.stdout)
-    print("</pre>")
+__checkbox = "&#9744;"
+__hpblock = __checkbox * 5
+
+
+def checkline(n):
+    blks = n // 5
+    remn = n % 5
+    return " ".join(([ __hpblock ] * blks) + [ __checkbox * remn ])
+
+
+# expects a list of hitpoints values
+# returns a list of lines
+
+def hpblocks(hitpoints):
+    hponce = "HP"
+    hplist = []
+    for hp in hitpoints:
+        n = min(20, hp)
+        rhp = hp - n
+        hplist.append("%s\t%d\t%s" % (hponce, hp, checkline(n)))
+        hponce = ""
+        while rhp:
+            n = min(20, rhp)
+            rhp -= n
+            hplist.append("\t\t%s" % (checkline(n)))
+    return hplist
+
+
+def fixbold(s):
+    if not s.startswith('<b'):
+        return s
+    s = s.split('>')[1].split('<')[0]
+    return ODT.bold(ODT.nonbreak(s))
 
 
 # end of file.

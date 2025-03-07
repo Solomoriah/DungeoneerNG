@@ -119,7 +119,7 @@ def magicweapon(c, chance):
         return
     bonus = Dice.tableroller(meleeweaponbonus)[1]
     c.meleeweapon = "%s %s" % (c.meleeweapon, bonus)
-    c.damage = "%s %s" % (c.damage, bonus)
+    c.damage = "%s%s" % (c.damage, bonus)
 
 
 def bandits():
@@ -230,7 +230,7 @@ def generate(typ):
         party = bandits()
     else:
         party = pirates()
-    return htmlshowparty(party)
+    return party
 
 
 if __name__ == "__main__":

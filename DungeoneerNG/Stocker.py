@@ -1,5 +1,5 @@
-# Basic Fantasy RPG Dungeoneer Suite
-# Copyright 2007-2024 Chris Gonnerman
+# Basic Fantasy RPG Dungeoneer Next Generation Suite
+# Copyright 2007-2025 Chris Gonnerman
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -29,193 +29,74 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from . import Treasure, Dice, Adventurer, NPCs, Items, Traps, Monsters, Rooms
 
+import sys, os, time, cgi, zipfile, io, glob
 
-adventurer = Adventurer.generate
-bandit = NPCs.generate
+from . import Rooms
 
-version = "Version 1.1 (Core Rules Release 107)"
 
 ##############################################################################
 #  Tables and Supporting Functions
 ##############################################################################
 
-randenc = {
+randenc = {}
+for i in range(1, 10):
+    randenc[i] = [ 0, (1, "adventurer"), ]
+randenc[1].append((1, "bandit"))
 
-    1: [
-        0,
-        (1, adventurer, "NPC Adventurer Party", 1),
-        (1, bandit, "Bandits", "b"),
-    ],
-
-    2: [
-        0,
-        (1, adventurer, "NPC Adventurer Party", 2),
-    ],
-
-    3: [
-        0,
-        (1, adventurer, "NPC Adventurer Party", 3),
-    ],
-
-    4: [
-        0,
-        (1, adventurer, "NPC Adventurer Party", 4),
-    ],
-
-    5: [
-        0,
-        (1, adventurer, "NPC Adventurer Party", 5),
-    ],
-
-    6: [
-        0,
-        (1, adventurer, "NPC Adventurer Party", 6),
-    ],
-
-    7: [
-        0,
-        (1, adventurer, "NPC Adventurer Party", 7),
-    ],
-
-    8: [
-        0,
-        (1, adventurer, "NPC Adventurer Party", 8),
-    ],
-
-    9: [
-        0,
-        (1, adventurer, "NPC Adventurer Party", 9),
-    ],
-}
 
 for key in Monsters.monsters.keys():
     monster = Monsters.monsters[key]
-    lvl = monster["dungeonlevel"]
-    if type(lvl) is int:
-        lvl = (lvl,)
-    for l in lvl:
-        if l > 0:
+    lvl = monster.get("dungeonlevel", None)
+    if lvl is not None:
+        if type(lvl) is int:
+            lvl = (lvl,)
+        for l in lvl:
             if l not in randenc:
                 randenc[l] = [ 0 ]
-            randenc[l].append((2, key, monster))
+            randenc[l].append((1, "monster", key))
 
 
-def treasureformat(tr):
-    trlst = []
-    for t in tr:
-        if t.qty != 1:
-            nm = "%g %s" % (t.qty, t.shortname)
-        else:
-            nm = t.shortname
-        if t.cat != "Coin" and t.value > 0.0000001:
-            each = ""
-            if t.qty > 1:
-                each = " each"
-            nm = "%s (%g GP value%s)" % (nm, t.value, each)
-        trlst.append(nm)
-    return trlst
+class Paragraph:
+
+    def __init__(self):
+        self.category = "paragraph"
+        self.text = ""
 
 
-def null_fn(row, level):
-    if row[3]:
-        trlst = treasureformat(Treasure.Treasure("U%d" % level))
-        return "<p class='Text Body'>" + row[2] + " with Treasure: " + ", ".join(trlst)
-    return "<p class='Text Body'>" + row[2]
+def empty_fn(withtreasure = 0):
+    pass
 
 
-def trap_fn(row, level):
-    trap = "<p class='Text Body'>Trap: %s" % Dice.tableroller(Traps.traptable)[1]
-    treasure = ""
-    if row[3]:
-        trlst = treasureformat(Treasure.Treasure("U%d" % level))
-        treasure = " with Treasure: %s" % ", ".join(trlst)
-    return trap + treasure
+def monster_fn(withtreasure = 0):
+    pass
 
 
-statblock_fmt = "%(num)s %(name)s: AC %(ac)s, HD %(hitdice)s, #At %(noatt)s, Dam %(dam)s, Mv %(mv)s, Sv %(sv)s, ML %(ml)s"
+def special_fn(*args):
+    pass
 
 
-def monster_fn(row, level):
-    level = min(level, 8)
-    if level in randenc:
-        rand_tbl = randenc[level]
-    else:
-        rand_tbl = [ 0 ]
-    contents = Dice.tableroller(rand_tbl)
-    treasure = ""
-    if type(contents[1]) is type(""): # it's a monster
-        monster = contents[2]
-        hd = monster["hd"]
-        if hd[1] == 8:
-            monster["hitdice"] = "%d" % hd[0]
-        else:
-            monster["hitdice"] = "%dd%d" % hd[:-1]
-        if hd[2] != 0:
-            if hd[2] > 0:
-                monster["hitdice"] = "%s+%d" % (monster["hitdice"], hd[2])
-            else:
-                monster["hitdice"] = "%s%d" % (monster["hitdice"], hd[2])
-        tt = None
-        if type(monster["tt"]) == tuple:
-            tt = monster["tt"]
-            ls = []
-            for i in tt:
-                ls.append(str(i))
-            monster["tt"] = ", ".join(ls)
-        else:
-            tt = ( monster["tt"], )
-        num = monster["noapp"]
-        num = Dice.D(*num)
-        if row[3]:
-            if monster["tt"] != "None":
-                treasure = None
-                try:
-                    types, tr = Treasure.Factory(tt)
-                except:
-                    tr = []
-                    treasure = " with Treasure Type %s" % monster[-1]
-                trlst = treasureformat(tr)
-                if not treasure:
-                    treasure = " with Treasure: " + ", ".join(trlst)
-        monster["num"] = num
-        monster = (statblock_fmt % monster)
-
-        hplist = []
-
-        for i in range(num):
-            hplist.append(Adventurer.hitpointblock(max(1, Dice.D(*hd))))
-
-        monster = monster + "\n".join(hplist)
-
-    elif type(contents[1]) != type(""):
-        args = contents[3:]
-        monster = contents[1](*args)
-        treasure = ""
-    else:
-        monster = contents[1]
-        if row[3]:
-            treasure = "with Treasure"
-    return "%s<p class='Text Body'>%s" % (monster, treasure)
+def trap_fn(withtreasure = 0):
+    pass
 
 
 dungeon_table = [
     0,
-    (16, null_fn, "Empty", 0),
-    ( 4, null_fn, "Empty", 1),
-    (40, monster_fn, "Monster", 0),
-    (24, monster_fn, "Monster", 1),
-    ( 4, null_fn, "Special", 0),
-    ( 8, trap_fn, "Trap", 0),
-    ( 4, trap_fn, "Trap", 1),
+    (16, empty_fn, 0),
+    ( 4, empty_fn, 1),
+    (40, monster_fn, 0),
+    (24, monster_fn, 1),
+    ( 4, special_fn, 0),
+    ( 8, trap_fn, 0),
+    ( 4, trap_fn, 1),
 ]
+
 
 def makedungeon(level, rooms, first = 1):
 
-    body = [ ]
+    rc = [ ]
 
-    body.append("<p class='Text Body'>\n<b>%d Rooms on Level %d</b>" % (rooms, level))
+    rc.append(Paragraph("%d Rooms on Level %d" % (rooms, level)))
 
     for i in range(rooms):
         roomtype = Dice.tableroller(Rooms.roomtypes)

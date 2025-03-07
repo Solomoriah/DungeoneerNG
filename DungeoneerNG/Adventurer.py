@@ -31,7 +31,7 @@
 
 
 import random
-from . import Spells, Dice, Tables
+from . import Spells, Dice, Tables, ODT, Formatter
 
 
 # *******************************************************************************************************
@@ -468,6 +468,12 @@ class Character:
                 self.level = max(Dice.D(1, self.level), Dice.D(1, self.level))
             self.level = levels[self.level][clas]
 
+        self.specialbonus = 0
+        if self.clas in (0, 2) and self.level >= 5:
+            self.specialbonus = 1
+
+        self.xp = Tables.xpcalc("%d%s" % (self.level, "***"[:self.specialbonus]))
+
         self.attackbonus = Tables.characterab[self.level][self.clas]
 
         self.stats = [
@@ -535,10 +541,7 @@ class Character:
                 hp = hp + max(roll, 1)
             if self.level > 9:
                 hp = hp + (hitdice[self.clas][1] * (self.level - 9))
-            if self.noapp > 1:
-                self.hitpoints.append(hp)
-            else:
-                self.hitpoints = hp
+            self.hitpoints.append(hp)
 
     def calc(self):
         self.armorclass = self.armorvalue + self.shieldvalue + statbonuses[self.stats[3]] + self.ringpro
@@ -572,43 +575,73 @@ class Character:
 
         self.calc()
 
-    def __str__(self):
+    def to_odt(self):
 
-        res = []
+        odt = []
 
+        rcl = "%s %s %d" % (self.race, self.classname, self.level)
         if self.name:
-            res.append(self.name)
+            mblock = [ "%s, %s:" % (ODT.bold(self.name), rcl) ]
         else:
-            res.append("%d " % self.noapp)
-        res.append("%s %s %d," % (self.race, self.classname, self.level))
-        res.append("AC %d," % self.armorclass)
-        res.append("AB %d," % self.attackbonus)
-        res.append("HP %s," % ", ".join(self.hitpoints))
-        res.append("#At 1, Dam %s\n" % self.damage)
-        res.append(statstring(self.stats))
+            mblock = [ ODT.bold("%s %s:") % (self.noapp, rcl) ]
+
+        xpea = ''
+        if self.noapp > 1:
+            xpea = ' ea.'
+
+        mblock.append(ODT.nonbreak("AC %d," % self.armorclass))
+        mblock.append(ODT.nonbreak("AB +%d," % self.attackbonus))
+        mblock.append("%s%s," % (ODT.nonbreak("#At 1 "), Formatter.fixbold(self.meleeweapon.lower())))
+        mblock.append(ODT.nonbreak("Dam %s," % self.damage))
+        mblock.append(ODT.nonbreak("Mv %d'," % self.movement))
+        mblock.append(ODT.nonbreak("ML %d," % self.morale))
+        mblock.append(ODT.nonbreak("XP %d%s" % (self.xp, xpea)))
+
+        odt.append(ODT.monsterblock(" ".join(mblock)))
+
+        ss = statstring(self.stats, 1).strip()
+        if ss:
+            odt.append(ODT.monsterblock(ss))
+
         if self.spells is not None:
-            res.append("Spells:")
-            res.append(", ".join(self.spells))
+            spells = map(lambda s: ODT.bold(s.lower()), self.spells)
+            odt.append(ODT.monsterblock("Spells: %s" % ", ".join(spells)))
+
         items = []
         if self.armor:
-            items.append(self.armor)
+            if "+" in self.armor:
+                items.append(ODT.bold(self.armor.lower()))
+            else:
+                items.append(self.armor.lower())
         if self.shield:
-            items.append(self.shield)
-        items.append(self.meleeweapon)
+            if "+" in self.shield:
+                items.append(ODT.bold(self.shield.lower()))
+            else:
+                items.append(self.shield.lower())
+        if "+" in self.meleeweapon:
+            items.append(ODT.bold(self.meleeweapon.lower()))
+        else:
+            items.append(self.meleeweapon.lower())
         if self.ringpro > 0:
-            items.append("ring of protection +%d" % self.ringpro)
+            items.append(ODT.bold("ring of protection +%d" % self.ringpro))
         if self.potion:
-            items.append("<b>potion of %s</b>" % self.potion)
+            items.append(ODT.bold("potion of %s" % self.potion))
         if self.scroll:
             if "scroll" in self.scroll:
-                items.append("<b>%s</b>" % self.scroll)
+                items.append(ODT.bold(self.scroll))
             else:
                 items.append(self.scroll)
         if items:
-            res.append("<p class='MonsterBlock Body'>Equipment:")
-        res.append(", ".join(items))
+            odt.append(ODT.monsterblock("Equipment: %s" % (", ".join(items))))
 
-        return "\n".join(res)
+        hplist = Formatter.hpblocks(self.hitpoints)
+
+        for i in range(len(hplist)-1):
+            odt.append(ODT.hpcheckboxes(ODT.tab.join(hplist[i].split('\t'))))
+        if hplist:
+            odt.append(ODT.hpchecksend(ODT.tab.join(hplist[-1].split('\t'))))
+
+        return "".join(odt)
 
 
 def genmeleeweapon(cclass, level):
@@ -624,7 +657,7 @@ def genmeleeweapon(cclass, level):
     damage = wpn[3]
     if Dice.D(1, 100) < min(95, level * chance):
         row = Dice.tableroller(meleeweaponbonus)
-        bonus = " " + row[1]
+        bonus = row[1]
         damage = damage + bonus
 
     if bonus:
@@ -777,8 +810,13 @@ def htmlblock(character):
         res.append("<b>%s</b>, %s:" % (character.name, rcl))
     else:
         res.append("<b>%d %s:</b>" % (character.noapp, rcl))
-    res.append("AC %d, AB +%d, #At 1, Dam %s, Mv %d', ML %d" 
-        % (character.armorclass, character.attackbonus, character.damage, character.movement, character.morale))
+    xpea = ''
+    if character.noapp > 1:
+        xpea = ' ea.'
+    res.append("AC %d, AB +%d, #At 1 %s, Dam %s, Mv %d', ML %d, XP %d%s" 
+        % (character.armorclass, character.attackbonus, character.meleeweapon.lower(),
+           character.damage, character.movement, character.morale, character.xp, xpea)
+    )
     ss = statstring(character.stats, 1).strip()
     if ss:
         res.append("<p class='MonsterBlock'>%s" % ss)

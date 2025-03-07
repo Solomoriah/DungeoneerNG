@@ -30,23 +30,26 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
+import io, zipfile, glob, time, os
+
+
 content_body = None
 
 nbsp = chr(160)
 tab = '''<text:tab/>'''
 
 
-def document(s):
+def document(s, defcontent = "content.static"):
     global content_body
     if content_body is None:
-        fp = open("content.static")
+        fp = open(defcontent)
         content_body = fp.read()
         fp.close()
     return s.join(content_body.split("@text@"))
 
 
 def nonbreak(s):
-    return nbsp.join(s.split())
+    return nbsp.join(s.split(' '))
 
 
 def bold(s):
@@ -67,6 +70,31 @@ def hpchecksend(s):
 
 def monsterblock(s):
     return '''<text:p text:style-name="MonsterBlock">%s</text:p>''' % s
+
+
+def saveodt(odt, savedir = ".", stem = "doc", defcontent = "content.static", base = "base.odt"):
+
+    # clean up cache
+    t = time.time() - (10 * 60) # ten minutes ago
+    oldfn = time.strftime("%%s/%%s%Y%m%d%H%M%S.odt", time.localtime(t)) % (savedir, stem)
+    fns = glob.glob("%s/%s*.odt" % (savedir, stem))
+    for fn in fns:
+        if fn < oldfn:
+            os.remove(fn)
+
+    fp = open(base, "rb")
+    memfp = io.BytesIO(fp.read())
+    fp.close()
+    zipfp = zipfile.ZipFile(memfp, "a")
+    zipfp.writestr("content.xml", document(odt, defcontent))
+    zipfp.close()
+
+    fn = time.strftime("%%s/%%s%Y%m%d%H%M%S.odt") % (savedir, stem)
+    fp = open(fn, "wb")
+    fp.write(memfp.getvalue())
+    fp.close()
+
+    return fn
 
 
 # end of file.
