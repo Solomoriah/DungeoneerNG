@@ -163,9 +163,7 @@ class Monster(object):
         if hasattr(self, "equipment") and self.equipment:
             rc.append("Equipment: %s" % self.equipment)
 
-        self.hitpointblocks() # in case we haven't already done this.
-        for i in range(len(self.hpblocks)):
-            rc.append(self.hpblocks[i])
+        rc.append(Formatter.htmlhitpointblock(self.hitpoints))
 
         return "<p>".join(rc)
 

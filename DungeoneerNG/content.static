@@ -26,6 +26,14 @@
 <style:style style:name="T2" style:family="text">
 <style:text-properties fo:font-style="italic" style:font-style-asian="italic" style:font-style-complex="italic"/>
 </style:style>
+<style:style style:name="Sect1" style:family="section">
+<style:section-properties text:dont-balance-text-columns="false" style:editable="false">
+<style:columns fo:column-count="2" fo:column-gap="0.2in">
+<style:column style:rel-width="32767*" fo:start-indent="0in" fo:end-indent="0.1in"/>
+<style:column style:rel-width="32768*" fo:start-indent="0.1in" fo:end-indent="0in"/>
+</style:columns>
+</style:section-properties>
+</style:style>
 </office:automatic-styles>
 <office:body>
 <office:text>

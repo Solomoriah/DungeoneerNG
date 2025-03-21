@@ -177,6 +177,7 @@ _treasure_table = {
                 ]
             ),
          ],
+    # old treasure type H, pre 4thEd
     'H': [
             (75, _gen_coins, ("cp",  8, 10, 0,  100)),
             (75, _gen_coins, ("sp",  6, 10, 0, 1000)),
@@ -186,6 +187,173 @@ _treasure_table = {
             (50, _gen_gems,  ( 1, 100, 0, 1)),
             (50, _gen_art,   (10,   4, 0, 1)),
             (20, _gen_magic, [
+                    ("Any",    1, 4, 0, 1),
+                    ("Scroll", 0, 0, 1, 1),
+                    ("Potion", 0, 0, 1, 1),
+                ]
+            ),
+         ],
+    # new treasure type H, 4thEd, rolled according to the rules on page 164 of R142
+    # H2 through H7 generate coinage based on age category
+    # H.3 through H.14 generate gems, jewelry, and magic based on hit dice
+    # on the web page, generate a dragon treasure by entering both types
+    # together, separated by a space
+    'H2': [
+            (35, _gen_coins, ("cp",  8, 10, 0,  100)),
+            (35, _gen_coins, ("sp",  6, 10, 0, 1000)),
+            (35, _gen_coins, ("ep",  3, 10, 0, 1000)),
+            (35, _gen_coins, ("gp",  5,  8, 0, 1000)),
+            (35, _gen_coins, ("pp",  9,  8, 0,  100)),
+         ],
+    'H3': [
+            (45, _gen_coins, ("cp",  8, 10, 0,  100)),
+            (45, _gen_coins, ("sp",  6, 10, 0, 1000)),
+            (45, _gen_coins, ("ep",  3, 10, 0, 1000)),
+            (45, _gen_coins, ("gp",  5,  8, 0, 1000)),
+            (45, _gen_coins, ("pp",  9,  8, 0,  100)),
+         ],
+    'H4': [
+            (55, _gen_coins, ("cp",  8, 10, 0,  100)),
+            (55, _gen_coins, ("sp",  6, 10, 0, 1000)),
+            (55, _gen_coins, ("ep",  3, 10, 0, 1000)),
+            (55, _gen_coins, ("gp",  5,  8, 0, 1000)),
+            (55, _gen_coins, ("pp",  9,  8, 0,  100)),
+         ],
+    'H5': [
+            (65, _gen_coins, ("cp",  8, 10, 0,  100)),
+            (65, _gen_coins, ("sp",  6, 10, 0, 1000)),
+            (65, _gen_coins, ("ep",  3, 10, 0, 1000)),
+            (65, _gen_coins, ("gp",  5,  8, 0, 1000)),
+            (65, _gen_coins, ("pp",  9,  8, 0,  100)),
+         ],
+    'H6': [
+            (75, _gen_coins, ("cp",  8, 10, 0,  100)),
+            (75, _gen_coins, ("sp",  6, 10, 0, 1000)),
+            (75, _gen_coins, ("ep",  3, 10, 0, 1000)),
+            (75, _gen_coins, ("gp",  5,  8, 0, 1000)),
+            (75, _gen_coins, ("pp",  9,  8, 0,  100)),
+         ],
+    'H7': [
+            (85, _gen_coins, ("cp",  8, 10, 0,  100)),
+            (85, _gen_coins, ("sp",  6, 10, 0, 1000)),
+            (85, _gen_coins, ("ep",  3, 10, 0, 1000)),
+            (85, _gen_coins, ("gp",  5,  8, 0, 1000)),
+            (85, _gen_coins, ("pp",  9,  8, 0,  100)),
+         ],
+    'H.3': [
+            (15, _gen_gems,  ( 1, 100, 0, 1)),
+            (15, _gen_art,   (10,   4, 0, 1)),
+            (15, _gen_magic, [
+                    ("Any",    1, 4, 0, 1),
+                    ("Scroll", 0, 0, 1, 1),
+                    ("Potion", 0, 0, 1, 1),
+                ]
+            ),
+         ],
+    'H.4': [
+            (20, _gen_gems,  ( 1, 100, 0, 1)),
+            (20, _gen_art,   (10,   4, 0, 1)),
+            (20, _gen_magic, [
+                    ("Any",    1, 4, 0, 1),
+                    ("Scroll", 0, 0, 1, 1),
+                    ("Potion", 0, 0, 1, 1),
+                ]
+            ),
+         ],
+    'H.5': [
+            (25, _gen_gems,  ( 1, 100, 0, 1)),
+            (25, _gen_art,   (10,   4, 0, 1)),
+            (25, _gen_magic, [
+                    ("Any",    1, 4, 0, 1),
+                    ("Scroll", 0, 0, 1, 1),
+                    ("Potion", 0, 0, 1, 1),
+                ]
+            ),
+         ],
+    'H.6': [
+            (30, _gen_gems,  ( 1, 100, 0, 1)),
+            (30, _gen_art,   (10,   4, 0, 1)),
+            (30, _gen_magic, [
+                    ("Any",    1, 4, 0, 1),
+                    ("Scroll", 0, 0, 1, 1),
+                    ("Potion", 0, 0, 1, 1),
+                ]
+            ),
+         ],
+    'H.7': [
+            (35, _gen_gems,  ( 1, 100, 0, 1)),
+            (35, _gen_art,   (10,   4, 0, 1)),
+            (35, _gen_magic, [
+                    ("Any",    1, 4, 0, 1),
+                    ("Scroll", 0, 0, 1, 1),
+                    ("Potion", 0, 0, 1, 1),
+                ]
+            ),
+         ],
+    'H.8': [
+            (40, _gen_gems,  ( 1, 100, 0, 1)),
+            (40, _gen_art,   (10,   4, 0, 1)),
+            (40, _gen_magic, [
+                    ("Any",    1, 4, 0, 1),
+                    ("Scroll", 0, 0, 1, 1),
+                    ("Potion", 0, 0, 1, 1),
+                ]
+            ),
+         ],
+    'H.9': [
+            (45, _gen_gems,  ( 1, 100, 0, 1)),
+            (45, _gen_art,   (10,   4, 0, 1)),
+            (45, _gen_magic, [
+                    ("Any",    1, 4, 0, 1),
+                    ("Scroll", 0, 0, 1, 1),
+                    ("Potion", 0, 0, 1, 1),
+                ]
+            ),
+         ],
+    'H.10': [
+            (50, _gen_gems,  ( 1, 100, 0, 1)),
+            (50, _gen_art,   (10,   4, 0, 1)),
+            (50, _gen_magic, [
+                    ("Any",    1, 4, 0, 1),
+                    ("Scroll", 0, 0, 1, 1),
+                    ("Potion", 0, 0, 1, 1),
+                ]
+            ),
+         ],
+    'H.11': [
+            (55, _gen_gems,  ( 1, 100, 0, 1)),
+            (55, _gen_art,   (10,   4, 0, 1)),
+            (55, _gen_magic, [
+                    ("Any",    1, 4, 0, 1),
+                    ("Scroll", 0, 0, 1, 1),
+                    ("Potion", 0, 0, 1, 1),
+                ]
+            ),
+         ],
+    'H.12': [
+            (60, _gen_gems,  ( 1, 100, 0, 1)),
+            (60, _gen_art,   (10,   4, 0, 1)),
+            (60, _gen_magic, [
+                    ("Any",    1, 4, 0, 1),
+                    ("Scroll", 0, 0, 1, 1),
+                    ("Potion", 0, 0, 1, 1),
+                ]
+            ),
+         ],
+    'H.13': [
+            (65, _gen_gems,  ( 1, 100, 0, 1)),
+            (65, _gen_art,   (10,   4, 0, 1)),
+            (65, _gen_magic, [
+                    ("Any",    1, 4, 0, 1),
+                    ("Scroll", 0, 0, 1, 1),
+                    ("Potion", 0, 0, 1, 1),
+                ]
+            ),
+         ],
+    'H.14': [
+            (70, _gen_gems,  ( 1, 100, 0, 1)),
+            (70, _gen_art,   (10,   4, 0, 1)),
+            (70, _gen_magic, [
                     ("Any",    1, 4, 0, 1),
                     ("Scroll", 0, 0, 1, 1),
                     ("Potion", 0, 0, 1, 1),
@@ -387,6 +555,8 @@ class Treasure(UserList):
 
     def generate(self, typ):
         typ = typ.upper()
+        if typ == "NONE":
+            return
         self.treasuretypes.append(typ)
         if typ in _treasure_table:
             tbl = _treasure_table[typ]
@@ -414,6 +584,9 @@ class Treasure(UserList):
                 self.data = list(filter(lambda x: x is not None, self.data))
 
     def to_html(self):
+        return "<p class=textbody>%s" % self.base_html()
+
+    def base_html(self):
 
         rc = []
 
@@ -447,7 +620,7 @@ class Treasure(UserList):
         return "Treasure: (nothing)"
 
     def to_odt(self):
-        return ODT.textbody(ODT.fixbold(self.to_html()))
+        return ODT.textbody(ODT.fixbold(self.base_html()))
 
 
 # end of script.

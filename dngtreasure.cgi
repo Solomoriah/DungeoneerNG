@@ -32,15 +32,10 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-import cgi, time, traceback, sys, html
+import cgi, time, sys, html, json
 
 
-def run():
-
-#    sys.stderr = sys.stdout
-#    print("Content-type: text/plain\n")
-
-    myid = "div%f" % time.time()
+try:
 
     sys.path.append(".")
 
@@ -65,12 +60,9 @@ def run():
         typenames.append(t.upper())
 
     body = [
-        "<table>",
+        "<table class=treasure>",
         "<thead>",
-        "<tr><td colspan=4><b>Treasure %s</b></td>" % ", ".join(typenames),
-        "<td>",
-        """<button class=redbutton onclick='$("%s").remove();'>X</button>""" % myid,
-        "</td></tr>",
+        "<tr><td colspan=5><b>Treasure %s</b></td></tr>" % ", ".join(typenames),
         "</thead>",
         "<tbody>",
         "<tr><td>Qty.</td><td colspan=2>Name/Description</td>",
@@ -103,18 +95,24 @@ def run():
     body.append("<p>")
     body.append(tr.to_html())
 
-    block = "\n".join([
-        "<div class=treasureblock id='%s'>" % myid,
-        "\n".join(body),
-        "</div>",
-    ])
+    block = "\n".join(body)
 
-    print("Content-type: text/html\n")
-    print(block)
+    print("Content-type: application/json\n")
+    print(json.dumps({
+        "html": block,
+        "odt": tr.to_odt(),
+    }))
 
+except SystemExit:
+    raise
 
-if __name__ == "__main__":
-    run()
+except:
+    import traceback
+    print("Content-type: application/json\n")
+    print(json.dumps({
+        "message": traceback.format_exc(),
+        "cancel": 1,
+    }))
 
 
 # end of file.

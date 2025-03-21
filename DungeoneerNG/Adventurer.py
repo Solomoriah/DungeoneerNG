@@ -684,7 +684,7 @@ class Character:
             res.append("<p>Equipment:")
         res.append(", ".join(items))
 
-        res.append(htmlhitpointblock(self.hitpoints))
+        res.append(Formatter.htmlhitpointblock(self.hitpoints))
 
         return "\n".join(res)
 
@@ -801,49 +801,6 @@ def generate(level):
         party.append(character)
 
     return party
-
-
-def htmlhitpointblock(hplst):
-
-    if type(hplst) is int:
-        hplst = [ hplst ]
-
-    rc = [ ]
-
-    for hp in hplst:
-
-        hprows = []
-
-        # hit point boxes
-        n = hp // 5
-        r = hp % 5
-
-        hprow = []
-        while n:
-            hprow.append("&#9744;" * 5)
-            n -= 1
-            if len(hprow) > 3:
-                hprows.append(" ".join(hprow))
-                hprow = []
-        if r:
-            hprow.append("&#9744;" * r)
-
-        if hprow:
-            hprows.append(" ".join(hprow))
-
-        if hprows:
-            hprows[0] = "".join([
-                "<tr><td style='width: 2em;'>HP</td>",
-                "<td style='width: 3em; text-align: right; padding-right: 1em;'>%d</td>" % hp,
-                "<td>%s</td></tr>" % hprows[0],
-            ])
-            for i in range(1, len(hprows)):
-                hprows[i] = "<tr><td></td><td></td><td>%s</td></tr>" % hprows[i]
-            hprows = [ "<table>\n%s\n</table>" % "\n".join(hprows) ]
-
-        rc.append("\n".join(hprows))
-
-    return "\n".join(rc)
 
 
 # end of file.

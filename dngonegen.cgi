@@ -32,45 +32,45 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-import cgi, time, traceback, sys
+import cgi, time, sys, json
+
 
 try:
 
     sys.path.append(".")
 
-    from DungeoneerNG import NPCs, Adventurer, ODT
+    from DungeoneerNG import Adventurer, ODT
 
     form = cgi.FieldStorage()
 
-    party = NPCs.generate(form.getfirst("type", "b"))
+    try:
+        level = int(form.getfirst("level", "1"))
+    except:
+        level = 1
 
-    odt = []
-    for chr in party:
-        odt.append(chr.to_odt())
-    odt = "".join(odt)
+    try:
+        klass = int(form.getfirst("class", "0"))
+    except:
+        klass = 0
 
-    fn = ODT.saveodt(odt, stem = "npc",
-        savedir = "DNGdata",
-        defcontent = "DungeoneerNG/content.static",
-        base = "DungeoneerNG/base.odt")
+    chr = Adventurer.Character(level, klass, actuallevel = 1)
 
-    print("Content-type: text/html\n")
+    print("Content-type: application/json\n")
+    print(json.dumps({
+        "html": chr.to_html(),
+        "odt": chr.to_odt(),
+    }))
 
-    myid = "div%f" % time.time()
-    print("<div class=npcblock id='%s'>" % myid)
-    print("<div style='float: right;'>")
-    print("""<button class=redbutton onclick='$("%s").remove();'>X</button>""" % myid)
-    print("</div>")
-    for chr in party:
-        sys.stdout.write(chr.to_html())
-    print("<p><a href='%s'>Download</a>" % fn)
-    print("</div>")
+except SystemExit:
+    raise
 
 except:
-    print("Content-type: text/plain\n")
-    print("<pre>")
-    traceback.print_exc(file = sys.stdout)
-    print("</pre>")
+    import traceback
+    print("Content-type: application/json\n")
+    print(json.dumps({
+        "message": traceback.format_exc(),
+        "cancel": 1,
+    }))
 
 
 # end of file.

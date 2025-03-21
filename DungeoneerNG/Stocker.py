@@ -57,9 +57,10 @@ for key in monsters.keys():
         if type(lvl) is int:
             lvl = (lvl,)
         for l in lvl:
-            if l not in randenc:
-                randenc[l] = [ 0 ]
-            randenc[l].append((1, "monster", key))
+            if l > 0:
+                if l not in randenc:
+                    randenc[l] = [ 0 ]
+                randenc[l].append((1, "monster", key))
 
 
 roomtypes = [
@@ -234,15 +235,23 @@ def monster_fn(level, withtreasure):
     row = Dice.tableroller(randenc[min(10, max(1, level))])
     if row[1] == "adventurer":
         rc.extend(generate(level))
+        if withtreasure:
+            tr = Treasure()
+            tr.generate("A")
+            rc.append(tr)
     elif row[1] == "bandit":
         rc.extend(bandits())
+        if withtreasure:
+            tr = Treasure()
+            tr.generate("A")
+            rc.append(tr)
     else:
         m = Monster(row[2], "dungeon")
         rc.append(m)
         if withtreasure:
             tr = Treasure()
             utyp = "U%d" % min(8, max(1, level))
-            typ = getattr(m, "personaltreasure", utyp)
+            typ = getattr(m, "personaltreasure", (utyp,))
             for tt in typ:
                 tr.generate(tt)
             rc.append(tr)
@@ -250,11 +259,13 @@ def monster_fn(level, withtreasure):
 
 
 def special_fn(*args):
-    return [ Paragraph("Special"), ]
+#    return [ Paragraph("Special"), ]
+    return [ ]
 
 
 def trap_fn(level, withtreasure):
-    rc = [ Paragraph("Trap") ]
+#    rc = [ Paragraph("Trap") ]
+    rc = [ ]
     if withtreasure:
         tr = Treasure()
         tr.generate("U%d" % min(8, max(1, level)))
@@ -277,13 +288,13 @@ dungeon_table = [
 def DungeonFactory(level, rooms, first = 1):
 
     rc = [ 
-        Paragraph("%d Rooms on Level %d" % (rooms, level)),
+        Paragraph("%d Rooms on Level %d" % (rooms, level), style = "SubHeading"),
     ]
 
     for i in range(rooms):
 
         roomtype = Dice.tableroller(roomtypes)
-        rc.append(Paragraph("%d. %s:" % (first+i, roomtypes[1]), style = "MapKeyHeading"))
+        rc.append(Paragraph("%d. %s:" % (first+i, roomtype[1]), style = "MapKeyHeading"))
 
         row = Dice.tableroller(dungeon_table)
         rc.append(Paragraph(row[1]))

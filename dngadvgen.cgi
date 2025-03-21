@@ -32,7 +32,7 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-import cgi, time, traceback, sys
+import cgi, time, sys, json
 
 try:
 
@@ -56,28 +56,24 @@ try:
         odt.append(chr.to_odt())
     odt = "".join(odt)
 
-    fn = ODT.saveodt(odt, stem = "adv",
-        savedir = "DNGdata",
-        defcontent = "DungeoneerNG/content.static",
-        base = "DungeoneerNG/base.odt")
+    html = "\n".join(map(lambda chr: chr.to_html(), party))
 
-    sys.stdout.write("Content-type: text/html\n\n")
+    print("Content-type: application/json\n")
+    print(json.dumps({
+        "html": html,
+        "odt": odt,
+    }))
 
-    myid = "div%f" % time.time()
-    print("<div class=npcblock id='%s'>" % myid)
-    print("<div style='float: right;'>")
-    print("""<button class=redbutton onclick='$("%s").remove();'>X</button>""" % myid)
-    print("</div>")
-    for chr in party:
-        sys.stdout.write(chr.to_html())
-    print("<p><a href='%s'>Download</a>" % fn)
-    print("</div>")
+except SystemExit:
+    raise
 
 except:
-    sys.stdout.write("Content-type: text/plain\n\n")
-    sys.stdout.write("<pre>\n")
-    traceback.print_exc(file = sys.stdout)
-    sys.stdout.write("</pre>\n")
+    import traceback
+    sys.stdout.write("Content-type: application/json\n\n")
+    print(json.dumps({
+        "message": traceback.format_exc(),
+        "cancel": 1,
+    }))
 
 
 # end of file.

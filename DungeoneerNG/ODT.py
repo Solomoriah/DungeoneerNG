@@ -85,6 +85,29 @@ def monsterblock(s):
     return '''<text:p text:style-name="MonsterBlock">%s</text:p>''' % s
 
 
+section_no = 100
+
+def twocolumnstart():
+    global section_no
+    section_no += 1
+    return '''<text:section text:style-name="Sect1" text:name="Section%d">''' % section_no
+
+def twocolumnend():
+    return '''</text:section>'''
+
+
+def buildodt(odt, defcontent = "content.static", base = "base.odt"):
+
+    fp = open(base, "rb")
+    memfp = io.BytesIO(fp.read())
+    fp.close()
+    zipfp = zipfile.ZipFile(memfp, "a")
+    zipfp.writestr("content.xml", document(odt, defcontent))
+    zipfp.close()
+
+    return memfp.getvalue()
+
+
 def saveodt(odt, savedir = ".", stem = "doc", defcontent = "content.static", base = "base.odt"):
 
     # clean up cache

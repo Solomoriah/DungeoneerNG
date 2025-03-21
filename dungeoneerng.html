@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+<title>Basic Fantasy Role-Playing Game</title>
+
+<!-- Open Graph stuff to make Facebook happy -->
+<meta property="og:title" content="Basic Fantasy Role-Playing Game"/> 
+<meta property="og:type" content="game"/> 
+<meta property="og:image" content="https://basicfantasy.org/images/sitecover.jpg"/> 
+<meta property="og:url" content="https://www.basicfantasy.org"/> 
+<meta property="og:site_name" content="Basic Fantasy Role-Playing Game"/> 
+<meta property="fb:admins" content="100001184259730"/> 
+
+<meta charset="UTF-8">
+
+<link rel="alternate" type="application/rss+xml" title="RSS" href="https://basicfantasy.org/rss.xml">
+
+<link rel="stylesheet" href="/normalize.css" type="text/css" />
+<link rel="stylesheet" href="/fonts/stylesheet.css" type="text/css" />
+<link rel="stylesheet" href="/base.css" type="text/css" />
+
+<script src="/js/prototype.js" type="text/javascript"></script>
+<script src="/js/scriptaculous.js" type="text/javascript"></script>
+
+
+
+<script src="/js/jsoncall.js" type="text/javascript"></script>
+
+<link rel="shortcut icon" href="favicon.ico" />
+
+</head>
+
+<body bgcolor="white">
+
+<div id=topboxouter>
+  <div id=topbox>
+    <span class=soutane style='display: inline-block; text-align: center; font-size: 120%;'>
+    <a href='index.html'>
+    <img border=0 src='/images/title-foreground.png'></a>
+    </span>
+
+    <div id=download-buttons>
+    <a href="downloads.html" class="blue-shiny-button">
+    <strong>Download the Rules</strong><br>Free download in source
+    and PDF formats</a>
+
+    <br>
+    <a href="buytherules.html" class="green-shiny-button"
+        style='margin-top: 8px; margin-bottom: 8px;'>
+    <strong>Buy the Books</strong><br>Available in hard and soft
+    cover at low cost</a>
+
+    <br>
+    <b>Core Rules 4thEd R141 &mdash; February 5, 2025</b>
+    </div>
+  </div>
+
+  <div id=menubarframe>
+    <ul id=menubar>
+    <li><a href='index.html' class=navbutton>Home</a>
+    <li><a href='downloads.html' class=navbutton>Downloads</a>
+    <li><a href='showcase.cgi' class=navbutton>Showcase</a>
+    <li><a href='srd' class=navbutton>SRD</a>
+    <li><a href="introstory.html" class=navbutton>Intro Story</a>
+    <li><a href="news.html" class=navbutton>News</a>
+    <li><a href="tools.html" class=navbutton>Tools</a>
+    <li><a href="contact.html" class=navbutton>Contact Us</a>
+    <li><a href="blog" class=navbutton>Blog</a>
+    <li><a href="forums" class=navbutton>Forums</a>
+    </ul>
+  </div>
+</div>
+
+  <div id='maincontentbox'>
+  <p>
+  <script>
+
+var currentid = 0;
+
+downloadodt = function() {
+
+    var blocks = $$("div.contentblock");
+    var odt = []
+
+    for(var i = 0; i < blocks.length; i++) {
+        odt.push(blocks[i].dataset.odt);
+    }
+
+    $("odtdata").value = odt.join("");
+    $("odtform").submit();
+};
+
+contentblock = function (contents) {
+    currentid += 1;
+    return [
+        "<div class=contentblock id=block" + currentid + " data-odt=''>",
+        "<div class=contentheader><div class=floatbox>",
+        "<button class=redbutton onclick='$(" + '"block' + currentid + '").remove();' + "'>X</button></div>",
+        "</div>",
+        "<div style='clear: both;'>",
+        contents,
+        "</div></div>",
+    ].join("");
+};
+
+addblock = function (block) {
+    $("dng_content").innerHTML = contentblock(block) + $("dng_content").innerHTML;
+}
+
+dngcallback = function (reply, parms) {
+    addblock(reply["html"]);
+    $("block"+currentid).dataset.odt = reply["odt"];
+}
+
+showtab = function (mytab) {
+    $$("#tabbedcontrols>div").forEach((element) => { element.style.display = "none"; });
+    $$("#controltabs>a").forEach((element) => { element.className = "taboff"; });
+    $(mytab).style.display = "block";
+    $(mytab+"button").className = "tabon";
+};
+
+clearcontent = function () {
+    $("dng_content").innerHTML = "";
+};
+
+stockergenerate = function () {
+    jsoncall("/dngstocker.cgi", {
+        level: $("levelfld").value,
+        rooms: $("roomsfld").value,
+        first: $("firstfld").value,
+    }, dngcallback);
+};
+
+onegenerate = function() {
+    jsoncall("/dngonegen.cgi", {
+        "class": $("class").value,
+        "level": $("level").value,
+    }, dngcallback);
+}
+
+advgenerate = function (level) {
+    jsoncall("/dngadvgen.cgi", {
+        "level": level
+    }, dngcallback);
+};
+
+npcgenerate = function (typ) {
+    jsoncall("/dngnpcgen.cgi", {
+        "type": typ
+    }, dngcallback);
+};
+
+treasureselector = function (obj) {
+    if(obj.className == "redbutton") {
+        obj.className = "";
+    } else {
+        obj.className = "redbutton";
+    }
+
+    var selectors = $$("span.biggerlink a");
+    var target = $("treasuretype");
+    target.value = "";
+
+    for(i = 0; i < selectors.length; i++) {
+        if(selectors[i].className == "redbutton") {
+            target.value = target.value + " " + selectors[i].innerHTML;
+        }
+    }
+
+    target.value = target.value.trim();
+};
+
+treasuregenerate = function (typ) {
+    if(typ.length > 0) {
+        $("treasuretype").value = typ;
+    }
+    jsoncall("/dngtreasure.cgi", {
+        treasuretype: $("treasuretype").value,
+    }, dngcallback);
+};
+
+resettreasure = function () {
+    var selectors = $$("span.biggerlink a");
+
+    for(i = 0; i < selectors.length; i++) {
+        selectors[i].className = "";
+    }
+
+    $("treasuretype").value = "";
+};
+
+var monstertimer = null;
+
+monsterlookup = function () {
+    if(monstertimer != null) {
+        clearTimeout(monstertimer);
+    }
+    monstertimer = setTimeout(() => {
+        new Ajax.Request("/dngmonstersearch.cgi?target=" + $("target").value, {
+            method: 'get',
+            asynchronous: true,
+            onSuccess: function (resp) {
+                $("monsterlist").innerHTML = resp.responseText;
+                $("onebtn").className = "graybutton";
+                $("dngbtn").className = "graybutton";
+                $("lairbtn").className = "graybutton";
+                $("wildbtn").className = "graybutton";
+            }
+        });
+    }, 100);
+};
+
+monsterselect = function () {
+    var myselect = $("monsterlist");
+    var myoption = myselect.options[myselect.selectedIndex];
+    if(myoption.dataset.noapp.includes("one")) {
+        $("onebtn").className = "redbutton";
+    } else {
+        $("onebtn").className = "graybutton";
+    }
+    if(myoption.dataset.noapp.includes("dungeon")) {
+        $("dngbtn").className = "redbutton";
+    } else {
+        $("dngbtn").className = "graybutton";
+    }
+    if(myoption.dataset.noapp.includes("lair")) {
+        $("lairbtn").className = "redbutton";
+    } else {
+        $("lairbtn").className = "graybutton";
+    }
+    if(myoption.dataset.noapp.includes("wild")) {
+        $("wildbtn").className = "redbutton";
+    } else {
+        $("wildbtn").className = "graybutton";
+    }
+}
+
+monstergenerate = function (mode) {
+
+    var myselect = $("monsterlist");
+    monster = myselect.value;
+
+    jsoncall("/dngmonstergen.cgi", {
+        "mode": mode,
+        "monster": monster
+    }, dngcallback);
+}
+
+</script>
+
+<h1>Dungeoneer Next Generation</h1>
+
+<div id=controltabs>
+  <a href='javascript: void(0);' onclick='showtab("npcs");' id=npcsbutton class=tabon>NPCs</a>
+  <a href='javascript: void(0);' onclick='showtab("monster");' id=monsterbutton class=taboff>Monsters</a>
+  <a href='javascript: void(0);' onclick='showtab("treasure");' id=treasurebutton class=taboff>Treasure</a>
+  <a href='javascript: void(0);' onclick='showtab("stocker");' id=stockerbutton class=taboff>Dungeon Rooms</a>
+  <div class=floatbox>
+    <a href='javascript: void(0);' onclick='downloadodt();' class=clearbutton>Download</a>
+    <a href='javascript: void(0);' onclick='clearcontent();' class=clearbutton>Clear</a>
+  </div>
+</div>
+
+<p>
+<div id=tabbedcontrols>
+
+    <div id=npcs>
+
+    <span class=biggerlink>
+    Adventurer Party &mdash; choose a level:
+    <br>
+    <a href='javascript: void(0);' onclick='advgenerate(1);'>1</a>
+    <a href='javascript: void(0);' onclick='advgenerate(2);'>2</a>
+    <a href='javascript: void(0);' onclick='advgenerate(3);'>3</a>
+    <a href='javascript: void(0);' onclick='advgenerate(4);'>4</a>
+    <a href='javascript: void(0);' onclick='advgenerate(5);'>5</a>
+    <a href='javascript: void(0);' onclick='advgenerate(6);'>6</a>
+    <a href='javascript: void(0);' onclick='advgenerate(7);'>7</a>
+    <a href='javascript: void(0);' onclick='advgenerate(8);'>8</a>
+    <a href='javascript: void(0);' onclick='advgenerate(9);'>9</a>
+    <a href='javascript: void(0);' onclick='advgenerate(10);'>10</a>
+    </span>
+    <p>
+    <span class=biggerlink>
+    NPC Party:
+    <a href='javascript: void(0);' onclick='npcgenerate("b");'>Bandits</a>
+    <a href='javascript: void(0);' onclick='npcgenerate("p");'>Pirates</a>
+    </span>
+
+    <p>
+    Generate an NPC by Class and Level:
+
+    <select id=class>
+    <option value=0>Cleric
+    <option value=1>Fighter
+    <option value=2>Magic User
+    <option value=3>Thief
+    </select>
+
+    <select id=level>
+    <option value=1>1st
+    <option value=2>2nd
+    <option value=3>3rd
+    <option value=4>4th
+    <option value=5>5th
+    <option value=6>6th
+    <option value=7>7th
+    <option value=8>8th
+    <option value=9>9th
+    <option value=10>10th
+    <option value=11>11th
+    <option value=12>12th
+    <option value=13>13th
+    <option value=14>14th
+    <option value=15>15th
+    <option value=16>16th
+    <option value=17>17th
+    <option value=18>18th
+    <option value=19>19th
+    <option value=20>20th
+    </select>
+
+    <a href='javascript: void(0);' onclick='onegenerate();' class=bluebutton>Generate</a>
+
+    </div>
+
+    <div id=monster style='display: none;'>
+    
+    <div>
+    Search
+    <input type=text id=target oninput='monsterlookup();'>
+    </div>
+    <div>
+    <select id=monsterlist size=10 onclick='monsterselect();'></select>
+    </div>
+    <div>
+    <a id=onebtn  class="graybutton" href='javascript: void(0);' onclick='monstergenerate("one");'>Single</a>
+    <br>
+    <a id=dngbtn  class="graybutton" href='javascript: void(0);' onclick='monstergenerate("dungeon");'>Dungeon</a>
+    <br>
+    <a id=lairbtn class="graybutton" href='javascript: void(0);' onclick='monstergenerate("lair");'>Lair</a>
+    <br>
+    <a id=wildbtn class="graybutton" href='javascript: void(0);' onclick='monstergenerate("wild");'>Wild</a>
+    </div>
+
+    </div>
+
+    <div id=treasure style='display: none;'>
+
+    <input type='text' id='treasuretype' value=''>
+    <a href='javascript: void(0);' onclick='treasuregenerate("");' class=bluebutton>Generate</a>
+    <br>
+
+    <span class=biggerlink>
+    <a href='javascript: void(0);' onclick='treasureselector(this);'>A</a>
+    <a href='javascript: void(0);' onclick='treasureselector(this);'>B</a>
+    <a href='javascript: void(0);' onclick='treasureselector(this);'>C</a>
+    <a href='javascript: void(0);' onclick='treasureselector(this);'>D</a>
+    <a href='javascript: void(0);' onclick='treasureselector(this);'>E</a>
+    <a href='javascript: void(0);' onclick='treasureselector(this);'>F</a>
+    <a href='javascript: void(0);' onclick='treasureselector(this);'>G</a>
+    <a href='javascript: void(0);' onclick='treasureselector(this);'>H</a>
+    <a href='javascript: void(0);' onclick='treasureselector(this);'>I</a>
+    <a href='javascript: void(0);' onclick='treasureselector(this);'>J</a>
+    <a href='javascript: void(0);' onclick='treasureselector(this);'>K</a>
+    <a href='javascript: void(0);' onclick='treasureselector(this);'>L</a>
+    <a href='javascript: void(0);' onclick='treasureselector(this);'>M</a>
+    <a href='javascript: void(0);' onclick='treasureselector(this);'>N</a>
+    <a href='javascript: void(0);' onclick='treasureselector(this);'>O</a>
+    <a href='javascript: void(0);' onclick='treasureselector(this);'>P</a>
+    <a href='javascript: void(0);' onclick='treasureselector(this);'>Q</a>
+    <a href='javascript: void(0);' onclick='treasureselector(this);'>R</a>
+    <a href='javascript: void(0);' onclick='treasureselector(this);'>S</a>
+    <a href='javascript: void(0);' onclick='treasureselector(this);'>T</a>
+    <a href='javascript: void(0);' onclick='treasureselector(this);'>U</a>
+    <a href='javascript: void(0);' onclick='treasureselector(this);'>V</a>
+    </span>
+    <span class=floatbox>
+    <a href='javascript: void(0);' onclick='resettreasure();' class=clearbutton>Reset</a>
+    </span>
+    <br>
+    <span class=biggerlink>
+    <a href='javascript: void(0);' onclick='treasureselector(this);'>Magic</a>
+    <a href='javascript: void(0);' onclick='treasureselector(this);'>Potion</a>
+    <a href='javascript: void(0);' onclick='treasureselector(this);'>Scroll</a>
+    <a href='javascript: void(0);' onclick='treasureselector(this);'>Wand</a>
+    <a href='javascript: void(0);' onclick='treasureselector(this);'>Staff</a>
+    <a href='javascript: void(0);' onclick='treasureselector(this);'>WSR</a>
+    <a href='javascript: void(0);' onclick='treasureselector(this);'>Misc</a>
+    <a href='javascript: void(0);' onclick='treasureselector(this);'>Rare</a>
+    <a href='javascript: void(0);' onclick='treasureselector(this);'>Armor</a>
+    <a href='javascript: void(0);' onclick='treasureselector(this);'>Weapon</a>
+    </span>
+    <br>
+    <span class=biggerlink>
+    <a href='javascript: void(0);' onclick='treasureselector(this);'>U1</a>
+    <a href='javascript: void(0);' onclick='treasureselector(this);'>U2</a>
+    <a href='javascript: void(0);' onclick='treasureselector(this);'>U3</a>
+    <a href='javascript: void(0);' onclick='treasureselector(this);'>U4</a>
+    <a href='javascript: void(0);' onclick='treasureselector(this);'>U5</a>
+    <a href='javascript: void(0);' onclick='treasureselector(this);'>U6</a>
+    <a href='javascript: void(0);' onclick='treasureselector(this);'>U7</a>
+    <a href='javascript: void(0);' onclick='treasureselector(this);'>U8</a>
+    </span>
+    <br>
+    <span class=biggerlink>
+    <a href='javascript: void(0);' onclick='treasureselector(this);'>H2</a>
+    <a href='javascript: void(0);' onclick='treasureselector(this);'>H3</a>
+    <a href='javascript: void(0);' onclick='treasureselector(this);'>H4</a>
+    <a href='javascript: void(0);' onclick='treasureselector(this);'>H5</a>
+    <a href='javascript: void(0);' onclick='treasureselector(this);'>H6</a>
+    <a href='javascript: void(0);' onclick='treasureselector(this);'>H7</a>
+    <a href='javascript: void(0);' onclick='treasureselector(this);'>H.3</a>
+    <a href='javascript: void(0);' onclick='treasureselector(this);'>H.4</a>
+    <a href='javascript: void(0);' onclick='treasureselector(this);'>H.5</a>
+    <a href='javascript: void(0);' onclick='treasureselector(this);'>H.6</a>
+    <a href='javascript: void(0);' onclick='treasureselector(this);'>H.7</a>
+    <a href='javascript: void(0);' onclick='treasureselector(this);'>H.8</a>
+    <a href='javascript: void(0);' onclick='treasureselector(this);'>H.9</a>
+    <a href='javascript: void(0);' onclick='treasureselector(this);'>H.10</a>
+    <a href='javascript: void(0);' onclick='treasureselector(this);'>H.11</a>
+    <a href='javascript: void(0);' onclick='treasureselector(this);'>H.12</a>
+    <a href='javascript: void(0);' onclick='treasureselector(this);'>H.13</a>
+    <a href='javascript: void(0);' onclick='treasureselector(this);'>H.14</a>
+    </span>
+
+    </div>
+
+    <div id=stocker style='display: none;'>
+    <label for=rooms>Number of Rooms:</label>
+    <input type=text id=roomsfld value=10>
+    <br>
+    <label for=first>First Room Number:</label>
+    <input type=text id=firstfld value=1>
+    <br>
+    <label for=level>Dungeon Level:</label>
+    <input type=text id=levelfld value=1>
+    <p>
+    <a href='javascript: void(0);' onclick='stockergenerate();' class=bluebutton>Generate</a>
+    </div>
+    
+</div>
+
+<div id=dng_content>
+</div>
+
+<form id=odtform method=post action='/dngmakeodt.cgi'>
+<input type=hidden id=odtdata name=odt value=''>
+</form>
+
+
+
+  <hr class=footer>
+
+  <div class=smaller>
+
+  <span style='display: inline-block;'>
+  &bull;
+  Basic Fantasy Role-Playing Game 4th Edition is distributed under the terms of the
+  <a class=hidden href='license.html'>CC BY-SA 4.0 International</a> license.
+  &bull;
+  </span>
+
+  <span style='display: inline-block;'>
+  &bull;
+  <a href='mailto:solomoriah@basicfantasy.org' class=hidden>
+  Site Design and Contents Copyright &copy; 2006-2025 Chris Gonnerman</a>
+  &bull;
+  </span>
+
+  <span style='display: inline-block;'>
+  &bull;
+  Artwork is property of the 
+  <a href='credits.html' class=hidden>individual contributors</a>.
+  &bull;
+  </span>
+
+  <span style='display: inline-block;'>
+  &bull;
+  All Rights Reserved.
+  &bull;
+  </span>
+
+  </div>
+</div>
+
+</body>
+</html>

@@ -79,7 +79,68 @@ class Paragraph:
         return ODT.genericparagraph(fixbold(self.text), self.style)
 
     def to_html(self):
-        return "<p>\n%s" % self.text
+        style = "".join(self.style.split()).lower()
+        return "<p class=%s>\n%s" % (style, self.text)
+
+
+class TwoColStart:
+    def to_odt(self):
+        return ODT.twocolumnstart()
+    def to_html(self):
+        return ''
+
+
+class TwoColEnd:
+    def to_odt(self):
+        return ODT.twocolumnend()
+    def to_html(self):
+        return ''
+
+
+def htmlhitpointblock(hplst):
+
+    if type(hplst) is int:
+        hplst = [ hplst ]
+
+    rc = [ ]
+
+    hponce = "HP"
+
+    for hp in hplst:
+
+        hprows = []
+
+        # hit point boxes
+        n = hp // 5
+        r = hp % 5
+
+        hprow = []
+        while n:
+            hprow.append("&#9744;" * 5)
+            n -= 1
+            if len(hprow) > 3:
+                hprows.append(" ".join(hprow))
+                hprow = []
+        if r:
+            hprow.append("&#9744;" * r)
+
+        if hprow:
+            hprows.append(" ".join(hprow))
+
+        if hprows:
+            hprows[0] = "".join([
+                "<tr><td style='width: 2em;'>%s</td>" % hponce,
+                "<td style='width: 3em; text-align: right; padding-right: 1em;'>%d</td>" % hp,
+                "<td>%s</td></tr>" % hprows[0],
+            ])
+            for i in range(1, len(hprows)):
+                hprows[i] = "<tr><td></td><td></td><td>%s</td></tr>" % hprows[i]
+            hprows = [ "<table>\n%s\n</table>" % "\n".join(hprows) ]
+            hponce = ""
+
+        rc.append("\n".join(hprows))
+
+    return "\n".join(rc)
 
 
 # end of file.

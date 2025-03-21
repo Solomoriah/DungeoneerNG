@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 
-# Basic Fantasy RPG DungeoneerNG Suite
+# Basic Fantasy RPG Dungeoneer Next Generation Suite
 # Copyright 2007-2025 Chris Gonnerman
 # All rights reserved.
 #
@@ -32,38 +32,49 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-import cgi, time, sys
+import os, sys, cgi, time, json
+
+#sys.stderr = sys.stdout
+#sys.stdout.write("Content-type: text/plain\n")
+#sys.stdout.flush()
+
+sys.path.append(".")
+from DungeoneerNG import Stocker, ODT
+
+
+def safeint(s, b):
+    try:
+        return int(s)
+    except:
+        return b
 
 try:
-    sys.path.append(".")
-    from DungeoneerNG import Monsters
+    # generate the dungeon
+
     form = cgi.FieldStorage()
-    target = form.getfirst("target", "").lower()
-    rc = []
-    if target:
-        keys = sorted(Monsters.monsters.keys())
-        for key in keys:
-            if key.lower().startswith(target):
-                m = Monsters.monsters[key]
-                dngnoapp = [ "one" ]
-                if "noapprolldungeon" in m:
-                    dngnoapp.append("dungeon")
-                if "noapprolllair" in m:
-                    dngnoapp.append("lair")
-                if "noapprollwild" in m:
-                    dngnoapp.append("wild")
-                rc.append((key, ",".join(dngnoapp)))
-            if len(rc) == 40:
-                break
-    print("Content-type: text/html\n")
-    print("\n".join(map(lambda s: "<option value='%s' data-noapp='%s'>%s</option>" % (s[0], s[1], s[0]), rc)))
+
+    level = safeint(form.getfirst("level", 1), 1)
+    first = safeint(form.getfirst("first", 1), 1)
+    rooms = safeint(form.getfirst("rooms", 1), 1)
+
+    dungeon = Stocker.DungeonFactory(level, rooms, first)
+
+    print("Content-type: application/json\n")
+    print(json.dumps({
+        "html": "\n".join(map(lambda o: o.to_html(), dungeon)),
+        "odt": "".join(map(lambda o: o.to_odt(), dungeon)),
+    }))
+
+except SystemExit:
+    raise
 
 except:
     import traceback
-    print("Content-type: text/plain\n")
-    print("<pre>")
-    traceback.print_exc(file = sys.stdout)
-    print("</pre>")
+    print("Content-type: application/json\n")
+    print(json.dumps({
+        "message": traceback.format_exc(),
+        "cancel": 1,
+    }))
 
 
 # end of file.

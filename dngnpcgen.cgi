@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 
-# Basic Fantasy RPG Dungeoneer Suite
+# Basic Fantasy RPG Dungeoneer Next Generation Suite
 # Copyright 2007-2025 Chris Gonnerman
 # All rights reserved.
 #
@@ -32,52 +32,41 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-import os, sys, cgi
-
-sys.stderr = sys.stdout
-sys.stdout.write("Content-type: text/plain\n")
-
-sys.path.append(".")
-from DungeoneerNG import Stocker, ODT
-
-sys.stderr = sys.stdout
-
-def safeint(s, b):
-    try:
-        return int(s)
-    except:
-        return b
+import cgi, time, sys, json
 
 try:
-    # generate the dungeon
+
+    sys.path.append(".")
+
+    from DungeoneerNG import NPCs, Adventurer, ODT
 
     form = cgi.FieldStorage()
 
-    level = safeint(form.getfirst("level", 1), 1)
-    first = safeint(form.getfirst("first", 1), 1)
-    rooms = safeint(form.getfirst("rooms", 1), 1)
+    party = NPCs.generate(form.getfirst("type", "b"))
 
-    dungeon = Stocker.DungeonFactory(level, rooms, first)
+    odt = []
+    for chr in party:
+        odt.append(chr.to_odt())
+    odt = "".join(odt)
 
-    odt = "".join(map(lambda o: o.to_odt(), dungeon))
+    html = "\n".join(map(lambda chr: chr.to_html(), party))
 
-    fn = ODT.saveodt(odt, stem = "dng",
-        savedir = "DNGdata",
-        defcontent = "DungeoneerNG/content.static",
-        base = "DungeoneerNG/base.odt")
+    print("Content-type: application/json\n")
+    print(json.dumps({
+        "html": html,
+        "odt": odt,
+    }))
 
-    print("Content-type: text/html\n")
-    print("\n".join(map(lambda o: o.to_html(), dungeon)))
-    
+except SystemExit:
+    raise
+
 except:
-
     import traceback
+    print("Content-type: application/json\n")
+    print(json.dumps({
+        "message": traceback.format_exc(),
+        "cancel": 1,
+    }))
 
-    print("Content-type: text/plain\n")
-
-    print("<pre>")
-    traceback.print_exc(file=sys.stdout)
-    print("</pre>")
-    
 
 # end of file.

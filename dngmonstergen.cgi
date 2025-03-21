@@ -32,7 +32,7 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-import cgi, time, traceback, sys, json
+import cgi, time, sys, json
 
 
 try:
@@ -42,15 +42,8 @@ try:
     form = cgi.FieldStorage()
     mode = form.getfirst("mode", "")
     monster = form.getfirst("monster", "")
-    try:
-        mlst = Monsters.MonsterFactory(monster, mode)
-    except:
-        print("Content-type: text/html\n")
-        print("Error: Monster generation failed.")
-        print("<pre>")
-        traceback.print_exc(file = sys.stdout)
-        print("</pre>")
-        sys.exit(0)
+
+    mlst = Monsters.MonsterFactory(monster, mode)
 
     odt = []
     allrc = []
@@ -62,26 +55,24 @@ try:
         odt.append(m.to_odt())
         allrc.append(m.to_html())
 
-    fn = ODT.saveodt("".join(odt), savedir = "DNGdata", stem = "mgen",
-        defcontent = "DungeoneerNG/content.static",
-        base = "DungeoneerNG/base.odt")
-
-    allrc.append("<a href='%s'>Download</a>" % fn)
+    html = "<p>\n".join(allrc)
 
     print("Content-type: application/json\n")
     print(json.dumps({
-        "html": "<p>\n".join(allrc),
-        "odt": fn,
+        "html": html,
+        "odt": "".join(odt),
     }))
 
 except SystemExit:
     raise
 
 except:
-    print("Content-type: text/plain\n")
-    print("<pre>")
-    traceback.print_exc(file = sys.stdout)
-    print("</pre>")
+    import traceback
+    sys.stdout.write("Content-type: application/json\n\n")
+    print(json.dumps({
+        "message": traceback.format_exc(),
+        "cancel": 1,
+    }))
 
 
 # end of file.
