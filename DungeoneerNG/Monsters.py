@@ -30,21 +30,23 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-from . import _Monsters, Dice, Spells, Adventurer, Tables, Treasure, ODT, Formatter
+from . import _CoreMonsters, _BeastsOfBurden, Dice, Spells, Adventurer, Tables, Treasure, ODT, Formatter
 
 
-monsters = _Monsters.monsters
+monsters = {}
+monsters.update(_CoreMonsters.monsters)
+monsters.update(_BeastsOfBurden.monsters)
 
 
 class Monster(object):
 
     def __init__(self, name, mode = "one", noapp = None):
         self.category = "monster"
-        m = _Monsters.monsters[name]
+        m = monsters[name]
         notes = []
         if "alternatetable" in m:
             oldm = m
-            m = _Monsters.monsters[Dice.tableroller(m["alternatetable"])[1]]
+            m = monsters[Dice.tableroller(m["alternatetable"])[1]]
             m["alternatetable"] = oldm["alternatetable"]
             m["allunique"] = oldm.get("allunique", 0)
         for key in m.keys():
@@ -116,7 +118,7 @@ class Monster(object):
                 secondary = (None, None, None)
             if myequipment is not None:
                 self.equipment = ", ".join(filter(None, [ primary[2], secondary[2], myequipment ]))
-            self.noattacks = "%s %s" % (self.baseattack, " or ".join(filter(None, [ primary[0], secondary[0] ])))
+            self.noattacks = ("%s %s" % (self.baseattack, " or ".join(filter(None, [ primary[0], secondary[0] ])))).strip()
             self.damage = ", ".join(filter(None, [ self.basedamage, primary[1], secondary[1] ]))
         if notes:
             self.notes = notes

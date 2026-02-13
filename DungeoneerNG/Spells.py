@@ -153,7 +153,7 @@ magicuserspells = [
         "Continual Darkness",
         "Detect Evil*",
         "Detect Invisible",
-        "ESP",
+        "Mind Reading",
         "Invisibility",
         "Knock",
         "Levitate",

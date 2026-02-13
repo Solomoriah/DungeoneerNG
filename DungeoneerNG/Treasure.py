@@ -509,6 +509,7 @@ _treasure_table = {
 
     # extra stuff
 
+    'GEM':          [ (100, _gen_gems,   (0, 0, 1, 1)), ],
     'ART':          [ (100, _gen_art,   (0, 0, 1, 1)), ],
 
     # magic classes

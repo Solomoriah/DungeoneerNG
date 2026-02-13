@@ -431,13 +431,16 @@ def statstring(stats, abbrev = 0):
     for i in range(6):
         sb = statbonuses[stats[i]]
         if not abbrev or sb != 0:
-            rc.append(statnames[i][0])
-            rc.append(str(stats[i]))
             if sb > 0:
-                rc.append("(+%d)" % sb)
+                sb_str = "(+%d)" % sb
             elif sb < 0:
-                rc.append("(%d)" % sb)
-    return " ".join(rc)
+                sb_str = "(%d)" % sb
+            rc.append(" ".join([
+                statnames[i][0],
+                str(stats[i]),
+                sb_str,
+            ]))
+    return ", ".join(rc)
 
 
 # *******************************************************************************************************
