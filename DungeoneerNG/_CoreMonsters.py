@@ -1,5 +1,5 @@
 # Basic Fantasy RPG Dungeoneer Suite
-# Copyright 2007-2025 Chris Gonnerman
+# Copyright 2007-2026 Chris Gonnerman
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -5233,6 +5233,11 @@ monsters = {
         'saveas': 'Fighter: 2',
         'specialbonus': 0,
         'treasure': 'D',
+        'weapontable': [ 0,
+            (1, "1 longsword", 0, "1d8+1 longsword", "longsword"),
+            (2, "1 scimitar",  0, "1d8+1 scimitar",  "scimitar"),
+            (4, "1 spear",     0, "1d6+1 spear",     "spear"),
+        ],
         'xp': '75',
     },
     'Lizard Man, Subterranean (Troglodyte)': {
