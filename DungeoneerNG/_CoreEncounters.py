@@ -313,6 +313,34 @@ wilderness_encounters = {
     ],
 }
 
+city_encounters = {
+    "Day": [
+        ( 6, "monster", "Doppleganger"),
+        (12, "npc",     "Noble"),
+        (18, "npcenc",  "Thief"),
+        (24, "npcenc",  "Bully"),
+        (30, "npcenc",  "City Watch"),
+        (30, "npc",     "Merchant"),
+        (30, "npcenc",  "Beggar"),
+        (24, "npcenc",  "Priest"),
+        (18, "npcenc",  "Mercenary"),
+        (12, "npcenc",  "Wizard"),
+        ( 6, "monster", "Lycanthrope, Wererat"),
+    ],
+    "Night": [
+        ( 6, "monster", "Doppleganger"),
+        (12, "monster", "Shadow"),
+        (18, "npcenc",  "Press Gang"),
+        (24, "npcenc",  "Beggar"),
+        (30, "npcenc",  "Thief"),
+        (30, "npcenc",  "Bully"),
+        (30, "npc",     "Merchant"),
+        (24, "monster", "Rat, Giant"),
+        (18, "npcenc",  "City Watch"),
+        (12, "npcenc",  "Wizard"),
+        ( 6, "monster", "Lycanthrope, Wererat"),
+    ],
+}
 
 if __name__ == "__main__":
     from _CoreMonsters import monsters
@@ -326,6 +354,11 @@ if __name__ == "__main__":
                     print("dungeon", key, name)
     for key in sorted(wilderness_encounters.keys()):
         for odds, typ, name in wilderness_encounters[key]:
+            if typ == "monster":
+                if name not in monsters:
+                    print("wilderness", key, name)
+    for key in sorted(city_encounters.keys()):
+        for odds, typ, name in city_encounters[key]:
             if typ == "monster":
                 if name not in monsters:
                     print("wilderness", key, name)

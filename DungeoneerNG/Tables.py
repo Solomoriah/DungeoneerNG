@@ -1,5 +1,5 @@
 # Basic Fantasy RPG Dungeoneer Next Generation Suite
-# Copyright 2007-2025 Chris Gonnerman
+# Copyright 2007-2026 Chris Gonnerman
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -96,8 +96,8 @@ def xpcalc(hitdice):
     if hitdice.startswith("1/2") or hitdice.startswith("1d2"):
         hdval = 0
     else:
-        hdval = int(re.match("(\d\d*)", hitdice).group(1))
-    specb = len(re.search("(\**)$", hitdice).group(1))
+        hdval = int(re.match(r"(\d\d*)", hitdice).group(1))
+    specb = len(re.search(r"(\**)$", hitdice).group(1))
     if hdval in xptable:
         return xptable[hdval][0] + (xptable[hdval][1] * specb)
     topval = xptable[25]
