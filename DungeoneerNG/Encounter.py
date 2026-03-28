@@ -29,33 +29,55 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from . import _CoreEncounters, Dice, Monsters
+from . import _CoreEncounters, Dice, Monsters, NPCs, Adventurer
+from .Formatter import Paragraph
 
 dungeon_encounters = _CoreEncounters.dungeon_encounters
 wilderness_encounters = _CoreEncounters.wilderness_encounters
 city_encounters = _CoreEncounters.city_encounters
 
 
-def DungeonEncounter(level):
+def generate(type_fld, level_fld):
 
-    tbl = dungeon_encounters.get(level, None)
+    if type_fld == "wilderness":
+        tbl = wilderness_encounters.get(level_fld, None)
+    elif type_fld == "city":
+        tbl = city_encounters.get(level_fld, None)
+    else:
+        tbl = dungeon_encounters.get(level_fld, None)
     if tbl is None:
-        return []
+        return [ Paragraph("%s %s not found." % (type_fld, level_fld)) ]
 
     row = Dice.Roll(tbl)
 
+    if type_fld == "dungeon":
+        tag = "Level %s" % level_fld
+    else:
+        tag = level_fld.capitalize()
+
+    rc = [
+        Paragraph("%s %s Encounter: %s" % (tag, type_fld.capitalize(), row[2]), style = "SubHeading"),
+    ]
+
     if row[1] == "monster":
         if row[2] in Monsters.monsters:
-            return Monsters.MonsterFactory(row[2], mode = "dungeon")
-#    elif row[1] == "npc":
+            return rc + Monsters.MonsterFactory(row[2], mode = type_fld)
+    elif row[1] == "npc":
+        if row[2] == "Bandit":
+            return rc + NPCs.bandits()
+        elif row[2] == "Pirate":
+            return rc + NPCs.pirates()
+        elif row[2] == "Buccaneer":
+            return rc + NPCs.pirates()
+        elif row[2] == "Adventurer":
+            return rc + Adventurer.generate(level_fld)
+#        elif row[2] == "Merchant":
+#        elif row[2] == "Pilgrim":
+#        elif row[2] == "Noble":
+
 #    elif row[1] == "npcenc":
 
-    return [ "%s: %s" % (row[1], row[2]) ]
-
-
-# test code no longer works. gah.
-if __name__ == "__main__":
-    print(Encounter.DungeonEncounter(Dice.D(1, 8, 0)))
+    return [ Paragraph("Fell Through %s %s -> %s %s" % (type_fld, level_fld, row[1], row[2])) ]
 
 
 # end of file.

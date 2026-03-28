@@ -415,6 +415,12 @@ def DragonFactory(prime, name, mode, agecategory = 0):
 
 def MonsterFactory(name, mode = "one"):
 
+    # adjustments for Encounter.py
+    if mode == "city":
+        mode = "dungeon"
+    if mode == "wilderness":
+        mode = "wild"
+
     prime = Monster(name, mode)
 
     if hasattr(prime, "dragontable"):

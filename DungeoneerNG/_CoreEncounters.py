@@ -31,13 +31,13 @@
 
 
 dungeon_encounters = {
-    1: [
+    "1": [
         (1, "monster",  "Bee, Giant"),
         (1, "monster",  "Goblin"),
         (1, "monster",  "Jelly, Green (Green Slime)"),
         (1, "monster",  "Kobold"),
-        (1, "npc",     "Adventurer"),
-        (1, "npc",     "Bandit"),
+        (1, "npc",      "Adventurer"),
+        (1, "npc",      "Bandit"),
         (1, "monster",  "Orc"),
         (1, "monster",  "Stirge"),
         (1, "monster",  "Skeleton"),
@@ -45,7 +45,7 @@ dungeon_encounters = {
         (1, "monster",  "Spider, Giant Crab"),
         (1, "monster",  "Wolf"),
     ],
-    2: [
+    "2": [
         (1, "monster",  "Beetle, Giant Bombardier"),
         (1, "monster",  "Fly, Giant"),
         (1, "monster",  "Ghoul"),
@@ -59,7 +59,7 @@ dungeon_encounters = {
         (1, "monster",  "Lizard Man, Subterranean (Troglodyte)"),
         (1, "monster",  "Zombie"),
     ],
-    3: [
+    "3": [
         (1, "monster",  "Ant, Giant"),
         (1, "monster",  "Ape, Carnivorous"),
         (1, "monster",  "Beetle, Giant Tiger"),
@@ -73,7 +73,7 @@ dungeon_encounters = {
         (1, "monster",  "Tentacle Worm"),
         (1, "monster",  "Wight"),
     ],
-    4: [
+    "4": [
         (1, "monster",  "Bear, Cave"),
         (1, "monster",  "Caecilia, Giant"),
         (1, "monster",  "Cockatrice"),
@@ -87,7 +87,7 @@ dungeon_encounters = {
         (1, "monster",  "Owlbear"),
         (1, "monster",  "Wraith"),
     ],
-    6: [
+    "6": [
         (1, "monster",  "Basilisk, Common"),
         (1, "monster",  "Jelly, Black (Black Pudding)"),
         (1, "monster",  "Caecilia, Giant"),
@@ -101,7 +101,7 @@ dungeon_encounters = {
         (1, "monster",  "Spectre"),
         (1, "monster",  "Troll"),
     ],
-    7: [
+    "7": [
         (1, "monster",  "Basilisk, Common"),
         (1, "monster",  "Jelly, Black (Black Pudding)"),
         (1, "monster",  "Caecilia, Giant"),
@@ -115,7 +115,7 @@ dungeon_encounters = {
         (1, "monster",  "Spectre"),
         (1, "monster",  "Troll"),
     ],
-    8: [
+    "8": [
         (1, "monster",  "Basilisk, Greater"),
         (1, "monster",  "Chimera"),
         (1, "monster",  "Greater Deceiver"),
@@ -131,10 +131,10 @@ dungeon_encounters = {
     ],
 }
 
-dungeon_encounters[5] = dungeon_encounters[4]
+dungeon_encounters["5"] = dungeon_encounters["4"]
 
 wilderness_encounters = {
-    "Desert or Barren": [
+    "desert": [
         ( 6, "monster", "Dragon, Desert (Blue Dragon)"),
         (12, "monster", "Hellhound"),
         (18, "monster", "Giant, Fire"),
@@ -160,7 +160,7 @@ wilderness_encounters = {
         (12, "monster", "Gnoll"),
         ( 6, "monster", "Dragon, Mountain (Red Dragon)"),
     ],
-    "Grassland": [
+    "grass": [
         (1, "monster",  "Dragon, Plains (Yellow Dragon)"),
         (2, "monster",  "Troll"),
         (3, "monster",  "Fly, Giant"),
@@ -177,7 +177,7 @@ wilderness_encounters = {
         (2, "monster",  "Wolf, Dire"),
         (1, "monster",  "Giant, Hill"),
     ],
-    "Inhabited Territories": [
+    "inhabited": [
         ( 6, "monster", "Dragon, Cloud"),
         (12, "monster", "Ghoul"),
         (18, "monster", "Bugbear"),
@@ -196,7 +196,7 @@ wilderness_encounters = {
         ( 2, "monster", "Vampire, 8 HD"),
         ( 1, "monster", "Vampire, 9 HD"),
     ],
-    "Jungle": [
+    "jungle": [
         ( 6, "monster", "Dragon, Forest (Green Dragon)"),
         (12, "npc",     "Bandit"),
         (18, "monster", "Goblin"),
@@ -213,7 +213,7 @@ wilderness_encounters = {
         (12, "npc",     "Merchant"),
         ( 6, "monster", "Lycanthrope, Weretiger"),
     ],
-    "Mountains or Hills": [
+    "mountains": [
         ( 6, "monster", "Dragon, Ice (White Dragon)"),
         ( 6, "monster", "Roc"),
         ( 4, "monster", "Roc, Large"),
@@ -232,7 +232,7 @@ wilderness_encounters = {
         (12, "monster", "Wolf, Dire"),
         ( 6, "monster", "Dragon, Mountain (Red Dragon)"),
     ],
-    "Ocean": [
+    "ocean": [
         ( 6, "monster", "Dragon, Sea (Gray Dragon)"),
         ( 2, "monster", "Hydra, 5 Headed"),
         ( 2, "monster", "Hydra, 6 Headed"),
@@ -249,7 +249,7 @@ wilderness_encounters = {
         (36, "monster", "Octopus, Giant"),
         (36, "monster", "Shark, Mako"),
         (36, "npc",     "Merchant"),
-        (30, "npc",     "Buccaneer (Pirate)"),
+        (30, "npc",     "Pirate"),
         (30, "monster", "Shark, Bull"),
         (15, "monster", "Roc, Large"),
         ( 9, "monster", "Roc, Giant"),
@@ -257,7 +257,7 @@ wilderness_encounters = {
         (12, "monster", "Mermaid"),
         ( 6, "monster", "Sea Serpent"),
     ],
-    "River or Riverside": [
+    "river": [
         ( 6, "monster", "Dragon, Swamp (Black Dragon)"),
         (12, "monster", "Fish, Giant Piranha"),
         (18, "monster", "Stirge"),
@@ -277,7 +277,7 @@ wilderness_encounters = {
         ( 2, "monster", "Water Termite, Giant, 4 HD"),
         ( 6, "monster", "Dragon, Forest (Green Dragon)"),
     ],
-    "Swamp": [
+    "swamp": [
         ( 6, "monster", "Dragon, Swamp (Black Dragon)"),
         (12, "monster", "Shadow"),
         (18, "monster", "Troll"),
@@ -294,7 +294,7 @@ wilderness_encounters = {
         (12, "monster", "Hangman Tree"),
         ( 6, "monster", "Basilisk, Common"),
     ],
-    "Woods or Forest": [
+    "forest": [
         ( 6, "monster", "Dragon, Forest (Green Dragon)"),
         (12, "monster", "Alicorn"),
         (18, "monster", "Treant"),
@@ -314,7 +314,7 @@ wilderness_encounters = {
 }
 
 city_encounters = {
-    "Day": [
+    "day": [
         ( 6, "monster", "Doppleganger"),
         (12, "npc",     "Noble"),
         (18, "npcenc",  "Thief"),
@@ -327,7 +327,7 @@ city_encounters = {
         (12, "npcenc",  "Wizard"),
         ( 6, "monster", "Lycanthrope, Wererat"),
     ],
-    "Night": [
+    "night": [
         ( 6, "monster", "Doppleganger"),
         (12, "monster", "Shadow"),
         (18, "npcenc",  "Press Gang"),

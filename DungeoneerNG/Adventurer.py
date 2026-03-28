@@ -775,6 +775,11 @@ def genshield(cclass, level):
 
 def generate(level):
 
+    try:
+        level = int(level)
+    except:
+        level = 1
+
     ftrs = Dice.D(1, 3)
     thfs = Dice.D(1, 2)
     clrs = Dice.D(1, 2)
