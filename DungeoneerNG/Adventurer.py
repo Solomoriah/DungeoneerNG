@@ -466,7 +466,7 @@ class Character:
         self.spells = None
 
         self.level = level
-        if not actuallevel:
+        if level and not actuallevel:
             if Dice.D(1, 100) <= 30:
                 self.level = max(Dice.D(1, self.level), Dice.D(1, self.level))
             self.level = levels[self.level][clas]
@@ -539,11 +539,14 @@ class Character:
         self.hitpoints = []
         for j in range(self.noapp):
             hp = 0
-            for i in range(min(self.level, 9)):
-                roll = Dice.D(1, hitdice[self.clas][0]) + statbonuses[self.stats[4]]
-                hp = hp + max(roll, 1)
-            if self.level > 9:
-                hp = hp + (hitdice[self.clas][1] * (self.level - 9))
+            if self.level == 0:
+                hp = max(1, Dice.D(1, 4) + statbonuses[self.stats[4]], Dice.D(1, 4) + statbonuses[self.stats[4]])
+            else:
+                for i in range(min(self.level, 9)):
+                    roll = Dice.D(1, hitdice[self.clas][0]) + statbonuses[self.stats[4]]
+                    hp = hp + max(roll, 1)
+                if self.level > 9:
+                    hp = hp + (hitdice[self.clas][1] * (self.level - 9))
             self.hitpoints.append(hp)
 
     def calc(self):
@@ -583,6 +586,8 @@ class Character:
         odt = []
 
         rcl = "%s %s %d" % (self.race, self.classname, self.level)
+        if self.level == 0:
+            rcl = "Normal %s" % self.race
         if self.name:
             mblock = [ "%s, %s:" % (ODT.bold(self.name), rcl) ]
         else:
@@ -651,6 +656,8 @@ class Character:
         res = [ "<p>" ]
 
         rcl = "%s %s %d" % (self.race, self.classname, self.level)
+        if self.level == 0:
+            rcl = "Normal %s" % self.race
         if self.name:
             res.append("<b>%s</b>, %s:" % (self.name, rcl))
         else:

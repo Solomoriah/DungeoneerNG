@@ -71,7 +71,8 @@ def generate(type_fld, level_fld):
             return rc + NPCs.pirates()
         elif row[2] == "Adventurer":
             return rc + Adventurer.generate(level_fld)
-#        elif row[2] == "Merchant":
+        elif row[2] == "Merchant":
+            return rc + NPCs.merchants()
 #        elif row[2] == "Pilgrim":
 #        elif row[2] == "Noble":
 

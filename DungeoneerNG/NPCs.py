@@ -31,6 +31,7 @@
 
 from .Adventurer import *
 from . import Dice
+from .Formatter import Paragraph
 
 
 banditarmor = [
@@ -221,6 +222,35 @@ def pirates():
         for i in range(character.noapp):
             character.hitpoints.append(character.rollhp())
         party.append(character)
+
+    return party
+
+
+def merchants():
+
+    party = []
+
+    # 50% of a single merchant, 50% 1d4+1
+
+    num_merch = 1
+    if Dice.D(1, 100) >= 50:
+        num_merch = Dice.D(1, 4, 1)
+
+    party.append(Paragraph("%d Merchants:" % num_merch))
+
+    for i in range(num_merch):
+        m = Character(0, 2, 0, 1)
+        m.noapp = 1
+        m.clas = 1
+        m.classname = "Fighter"
+        party.append(m)
+
+    return party
+
+
+def merchantship():
+
+    party = []
 
     return party
 

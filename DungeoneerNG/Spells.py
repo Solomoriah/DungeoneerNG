@@ -240,6 +240,9 @@ scrolltable = [
 
 def genspells(clas, level = 0, spelllevels = None):
 
+    if level == 0:
+        return None
+
     if clas == 0:
         tbl = clericspells
     else:

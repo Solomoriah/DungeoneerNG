@@ -70,7 +70,7 @@ def fixbold(s):
 
 class Paragraph:
 
-    def __init__(self, text, style = "Text Body"):
+    def __init__(self, text, style = "Text_20_body"):
         self.category = "paragraph"
         self.text = text
         self.style = style
