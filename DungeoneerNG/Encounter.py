@@ -73,6 +73,8 @@ def generate(type_fld, level_fld):
             return rc + Adventurer.generate(level_fld)
         elif row[2] == "Merchant":
             return rc + NPCs.merchants()
+        elif row[2] == "Merchant Ship":
+            return rc + NPCs.merchantship()
 #        elif row[2] == "Pilgrim":
 #        elif row[2] == "Noble":
 

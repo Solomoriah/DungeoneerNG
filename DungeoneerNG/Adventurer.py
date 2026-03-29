@@ -1,5 +1,5 @@
 # Basic Fantasy RPG Dungeoneer Next Generation Suite
-# Copyright 2007-2025 Chris Gonnerman
+# Copyright 2007-2026 Chris Gonnerman
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -448,7 +448,7 @@ def statstring(stats, abbrev = 0):
 
 class Character:
 
-    def __init__(self, level, clas, actuallevel = 0, outfit = 1):
+    def __init__(self, level, clas, actuallevel = 0, outfit = 1, avgstats = 0, booststats = 1, race = None):
 
         self.category = "character"
 
@@ -479,41 +479,45 @@ class Character:
 
         self.attackbonus = Tables.characterab[self.level][self.clas]
 
-        self.stats = [
-            Dice.D(3, 6), Dice.D(3, 6), Dice.D(3, 6),
-            Dice.D(3, 6), Dice.D(3, 6), Dice.D(3, 6)
-        ]
+        if avgstats:
+            self.stats = [ 11, 11, 11, 11, 11, 11 ]
+        else:
+            self.stats = [
+                Dice.D(3, 6), Dice.D(3, 6), Dice.D(3, 6),
+                Dice.D(3, 6), Dice.D(3, 6), Dice.D(3, 6)
+            ]
+            if booststats:
+                # boost prime if it's not good.
+                self.stats[primes[clas]] = max(self.stats[primes[clas]], Dice.D(3, 6), 9)
+                # boost constitution if it's not good.
+                self.stats[4] = max(self.stats[4], Dice.D(3, 6))
 
-        # boost prime if it's not good.
-        self.stats[primes[clas]] = max(self.stats[primes[clas]], Dice.D(3, 6), 9)
-        # boost constitution if it's not good.
-        self.stats[4] = max(self.stats[4], Dice.D(3, 6))
+        self.race = None
 
-        self.race = "Human"
+        if race is None:
+            self.race = "Human"
+            if Dice.D(1, 100) <= 25:
+                # this character will be a demi-human if the stats allow
+                eligible = []
+                if self.stats[4] >= 9:
+                    if self.clas != 2:
+                        eligible.append("Dwarf")
+                if self.stats[1] >= 9:
+                    eligible.append("Elf")
+                if self.stats[3] >= 9:
+                    if self.clas != 2:
+                        eligible.append("Halfling")
+                if eligible:
+                    self.race = random.choice(eligible)
+        else:
+            self.race = race
 
-        if Dice.D(1, 100) <= 25:
-            # this character will be a demi-human if the stats allow
-            eligible = []
-            if self.stats[4] >= 9:
-                if self.clas != 2:
-                    eligible.append("Dwarf")
-            if self.stats[1] >= 9:
-                eligible.append("Elf")
-            if self.stats[3] >= 9:
-                if self.clas != 2:
-                    eligible.append("Halfling")
-            if eligible:
-                race = random.choice(eligible)
-                if race == "Dwarf":
-                    if self.stats[5] > 17:
-                        self.stats[5] = 17
-                if race == "Elf":
-                    if self.stats[4] > 17:
-                        self.stats[4] = 17
-                if race == "Halfling":
-                    if self.stats[0] > 17:
-                        self.stats[0] = 17
-                self.race = race
+        if self.race == "Dwarf":
+            self.stats[5] = min(self.stats[5], 17)
+        if self.race == "Elf":
+            self.stats[4] = min(self.stats[4], 17)
+        if self.race == "Halfling":
+            self.stats[0] = min(self.stats[0], 17)
 
         self.movement = 40
         self.morale = 9

@@ -177,6 +177,9 @@ wilderness_encounters = {
         (2, "monster",  "Wolf, Dire"),
         (1, "monster",  "Giant, Hill"),
     ],
+    "inhabited-x": [
+        (36, "npc",     "Merchant"),
+    ],
     "inhabited": [
         ( 6, "monster", "Dragon, Cloud"),
         (12, "monster", "Ghoul"),
@@ -248,7 +251,7 @@ wilderness_encounters = {
         (30, "monster", "Whale, Killer"),
         (36, "monster", "Octopus, Giant"),
         (36, "monster", "Shark, Mako"),
-        (36, "npc",     "Merchant"),
+        (36, "npc",     "Merchant Ship"),
         (30, "npc",     "Pirate"),
         (30, "monster", "Shark, Bull"),
         (15, "monster", "Roc, Large"),
@@ -262,7 +265,7 @@ wilderness_encounters = {
         (12, "monster", "Fish, Giant Piranha"),
         (18, "monster", "Stirge"),
         (24, "monster", "Fish, Giant Bass"),
-        (30, "npc",     "Merchant"),
+        (30, "npc",     "Merchant Ship"),
         (30, "monster", "Lizard Man, Common"),
         (36, "monster", "Crocodile"),
         (36, "monster", "Frog, Giant"),

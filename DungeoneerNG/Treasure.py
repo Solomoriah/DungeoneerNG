@@ -1,5 +1,5 @@
 # Basic Fantasy RPG Dungeoneer Next Generation Suite
-# Copyright 2007-2025 Chris Gonnerman
+# Copyright 2007-2026 Chris Gonnerman
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -109,6 +109,16 @@ _treasure_table = {
             (50, _gen_gems,  (6, 6, 0, 1)),
             (50, _gen_art,   (6, 6, 0, 1)),
             (30, _gen_magic, ("Any", 0, 0, 3, 1)),
+         ],
+    # Merchant NPC party treasure, type A without magic
+    'A0M': [
+            (50, _gen_coins, ("cp", 5,  6, 0, 100)),
+            (60, _gen_coins, ("sp",  5, 6, 0, 100)),
+            (40, _gen_coins, ("ep", 5,  4, 0, 100)),
+            (70, _gen_coins, ("gp", 10,  6, 0, 100)),
+            (50, _gen_coins, ("pp",  1,  10, 0, 100)),
+            (50, _gen_gems,  (6, 6, 0, 1)),
+            (50, _gen_art,   (6, 6, 0, 1)),
          ],
     'B': [
             (75, _gen_coins, ("cp", 5,  10, 0,  100)),
@@ -583,6 +593,9 @@ class Treasure(UserList):
                         hits += 1
             if hits:
                 self.data = list(filter(lambda x: x is not None, self.data))
+
+    def __len__(self):
+        return len(self.data)
 
     def to_html(self):
         return "<p class=textbody>%s" % self.base_html()
