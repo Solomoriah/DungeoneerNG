@@ -784,17 +784,21 @@ def genshield(cclass, level):
 # factory function to create an entire adventurer party according to the
 # standard rules.
 
-def generate(level):
+def generate(level, ftrs = None, thfs = None, clrs = None, mus = None):
 
     try:
         level = int(level)
     except:
         level = 1
 
-    ftrs = Dice.D(1, 3)
-    thfs = Dice.D(1, 2)
-    clrs = Dice.D(1, 2)
-    mus = Dice.D(1, 2) - 1
+    if ftrs is None:
+        ftrs = Dice.D(1, 3)
+    if thfs is None:
+        thfs = Dice.D(1, 2)
+    if clrs is None:
+        clrs = Dice.D(1, 2)
+    if mus is None:
+        mus = Dice.D(1, 2) - 1
 
     party = []
     totlvl = 0
