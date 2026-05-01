@@ -1560,7 +1560,7 @@ monsters = {
         'noapprolllair': (1, 6, 0),
         'noapprollwild': (1, 6, 0),
         'noattacks': '1 fist or by weapon',
-        'baseattack': '1 fist',
+        'baseattack': '1 fist or',
         'saveas': 'Fighter: 4',
         'specialbonus': 1,
         'treasure': 'E',
