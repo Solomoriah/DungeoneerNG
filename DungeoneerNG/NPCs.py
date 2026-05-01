@@ -194,6 +194,14 @@ class Pilgrim(Character):
         self.calc()
 
 
+def nobles():
+
+    party = []
+    party_race = None
+
+    return party
+
+
 def pilgrims():
 
     party = []
@@ -549,6 +557,8 @@ def generate(typ):
         party = merchantship()
     elif typ == "m":
         party = merchants()
+    elif typ == "n":
+        party = nobles()
     elif typ == "pg":
         party = pilgrims()
     return party

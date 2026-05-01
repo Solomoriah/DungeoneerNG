@@ -70,7 +70,7 @@ def genericparagraph(s, style = "Text Body"):
 
 
 def textbody(s):
-    return '''<text:p text:style-name="Text Body">%s</text:p>''' % s
+    return '''<text:p text:style-name="Body Text">%s</text:p>''' % s
 
 
 def hpcheckboxes(s):
