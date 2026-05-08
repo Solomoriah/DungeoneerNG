@@ -222,6 +222,14 @@ statbonuses = (
     3
 )
 
+nmweapons = [
+    0,
+    [ 2, "dagger", 1, "1d4" ],
+    [ 6, "club", 1, "1d4" ],
+    [ 2, "hand axe", 1, "1d6" ],
+    [ 1, "shortsword", 1, "1d6" ],
+]
+
 meleeweapons = [
     [ 0,
         [ 3, "warhammer", 1, "1d6" ],
@@ -706,7 +714,10 @@ class Character:
 def genmeleeweapon(cclass, level):
 
     # choose a weapon type
-    wpn = Dice.tableroller(meleeweapons[cclass])
+    if level == 0:
+        wpn = Dice.tableroller(nmweapons)
+    else:
+        wpn = Dice.tableroller(meleeweapons[cclass])
 
     # is it magical?
     chance = 5
@@ -750,8 +761,8 @@ def genscroll(cclass, level):
 
 def genarmor(cclass, level):
 
-    if cclass == 2:
-        return defaultarmor[cclass]
+    if cclass == 2 or level == 0:
+        return defaultarmor[2]
 
     # is it magical?  (overrides armor type choice)
     chance = 5
@@ -767,7 +778,7 @@ def genarmor(cclass, level):
 
 def genshield(cclass, level):
 
-    if cclass > 1:
+    if cclass > 1 or level == 0:
         return [ 0, "", 0 ]
 
     arm = [ 0, "shield", 1 ]
