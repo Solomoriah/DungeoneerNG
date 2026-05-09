@@ -564,19 +564,21 @@ class Treasure(UserList):
         else:
             self.data = init
 
-    def generate(self, typ):
-        typ = typ.upper()
-        if typ == "NONE":
-            return
-        self.treasuretypes.append(typ)
-        if typ in _treasure_table:
-            tbl = _treasure_table[typ]
-            for i in tbl:
-                if Dice.D(1, 100, 0) <= i[0]:
-                    self.extend(i[1](i[2]))
-        else:
-            self.append(Unknown.Unknown(typ))
+    def generate(self, *args):
+        for typ in args:
+            typ = typ.upper()
+            if typ == "NONE":
+                return
+            self.treasuretypes.append(typ)
+            if typ in _treasure_table:
+                tbl = _treasure_table[typ]
+                for i in tbl:
+                    if Dice.D(1, 100, 0) <= i[0]:
+                        self.extend(i[1](i[2]))
+            else:
+                self.append(Unknown.Unknown(typ))
         self.combine()
+        return self
 
     def combine(self):
         self.data = sorted(self.data)
@@ -596,6 +598,30 @@ class Treasure(UserList):
 
     def __len__(self):
         return len(self.data)
+
+    def item_list(self):
+
+        rc = []
+
+        for t in self.data:
+            t.textvalue = "{:,.0f}".format(t.value)
+            t.textqty = "{:,.0f}".format(t.qty)
+            if t.cat == "Magic":
+                if t.qty > 1:
+                    rc.append("%s <b>%s</b>" % (t.textqty, t.shortname.lower()))
+                else:
+                    rc.append("<b>%s</b>" % t.shortname.lower())
+            elif t.cat == "Coin":
+                rc.append("%s %s" % (t.textqty, t.shortname.lower()))
+            elif t.value > 0:
+                if t.qty == 1:
+                    rc.append("%s (worth %s gp)" % (t.shortname.lower(), t.textvalue))
+                else:
+                    rc.append("%s %s (worth %s gp)" % (t.textqty, t.shortname.lower(), t.textvalue))
+            else:
+                rc.append("%s %s" % (t.textqty, t.shortname.lower()))
+
+        return rc
 
     def to_html(self):
         return "<p class=textbody>%s" % self.base_html()

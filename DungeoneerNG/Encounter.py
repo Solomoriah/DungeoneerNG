@@ -29,7 +29,7 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from . import _CoreEncounters, Dice, Monsters, NPCs, Adventurer
+from . import _CoreEncounters, Dice, Monsters, NPCs, Adventurer, Treasure
 from .Formatter import Paragraph
 
 dungeon_encounters = _CoreEncounters.dungeon_encounters
@@ -124,6 +124,43 @@ def citywatch():
 
 def mercenary():
     return citywatch() # close enough, and heading will be different
+
+def merchant():
+
+    party = []
+
+    # merchants
+
+    merchants = Dice.D(1, 4)
+    party.append(Paragraph("<b>%d Merchants:</b>" % merchants))
+
+    for i in range(merchants):
+        m = NPCs.Merchant()
+        t = Treasure.Treasure().generate("S", "T", "V")
+        m.items += t.item_list()
+        party.append(m)
+
+    # guards
+
+    guards = Dice.D(1, 4, 1)
+    lvl2 = Dice.D(1, guards)
+    lvl1 = guards - lvl2
+
+    party.append(Paragraph("<b>%d Guards:</b>" % (lvl1+lvl2)))
+
+    for i in range(lvl2):
+        lvl2ch = Adventurer.Character(2, 1, actuallevel = 2, outfit = 1)
+        party.append(lvl2ch)
+
+    if lvl1:
+        lvl1ch = Adventurer.Character(1, 1, actuallevel = 1, outfit = 1)
+        if lvl1 > 1:
+            lvl1ch.name = ""
+            lvl1ch.noapp = lvl1
+            lvl1ch.rollhp()
+        party.append(lvl1ch)
+
+    return party
 
 pressgangweapons = [
     0,
@@ -220,6 +257,7 @@ npcenc = {
     "Bully":        bully,
     "City Watch":   citywatch,
     "Mercenary":    mercenary,
+    "Merchant":     merchant,
     "Press Gang":   pressgang,
     "Priest":       priest,
     "Thief":        thief,

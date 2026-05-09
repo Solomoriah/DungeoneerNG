@@ -543,6 +543,8 @@ class Character:
 
         self.rollhp()
 
+        self.items = []
+
         if outfit:
             self.outfit()
         self.calc()
@@ -651,6 +653,7 @@ class Character:
                 items.append(ODT.bold(self.scroll))
             else:
                 items.append(self.scroll)
+        items += self.items
         if items:
             odt.append(ODT.monsterblock("Equipment: %s" % (", ".join(items))))
 
@@ -689,10 +692,10 @@ class Character:
             res.append("<b>%s</b>" % (", ".join(map(lambda s: s.lower(), self.spells))))
         items = []
         if self.armor:
-            items.append(self.armor)
+            items.append(self.armor.lower())
         if self.shield:
-            items.append(self.shield)
-        items.append(self.meleeweapon)
+            items.append(self.shield.lower())
+        items.append(self.meleeweapon.lower())
         if self.ringpro > 0:
             items.append("<b>ring of protection +%d</b>" % self.ringpro)
         if self.potion:
@@ -702,6 +705,7 @@ class Character:
                 items.append("<b>%s</b>" % self.scroll)
             else:
                 items.append(self.scroll)
+        items += self.items
         if items:
             res.append("<p>Equipment:")
         res.append(", ".join(items))
