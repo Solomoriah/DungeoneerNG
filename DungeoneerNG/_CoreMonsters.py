@@ -4687,8 +4687,8 @@ monsters = {
         'xp': '280',
     },
     'Jelly, Gray (Gray Ooze)': {
-        'name': 'Gray Ooze',
-        'names': 'Gray Oozes',
+        'name': 'Gray Jelly',
+        'names': 'Gray Jellies',
         'officialname': 'Jelly, Gray (Gray Ooze)',
         'dungeonlevel': (2, 3, 4),
         'encounterlevel': (2, 3, 4),
