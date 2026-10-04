@@ -4637,8 +4637,8 @@ monsters = {
         'officialname': 'Jaguar',
     },
     'Jelly, Black (Black Pudding)': {
-        'name': 'Black Pudding',
-        'names': 'Black Puddings',
+        'name': 'Black Jelly',
+        'names': 'Black Jellies',
         'officialname': 'Jelly, Black (Black Pudding)',
         'dungeonlevel': (6, 8),
         'encounterlevel': (6, 8),

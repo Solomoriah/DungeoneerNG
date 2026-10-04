@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 
 # Basic Fantasy RPG DungeoneerNG Suite
-# Copyright 2007-2025 Chris Gonnerman
+# Copyright 2007-2026 Chris Gonnerman
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -37,11 +37,12 @@ import cgi, time, sys, json
 
 try:
     sys.path.append(".")
-    from DungeoneerNG import Monsters, ODT
+    from DungeoneerNG import Monsters, ODT, Settings
 
     form = cgi.FieldStorage()
     mode = form.getfirst("mode", "")
     monster = form.getfirst("monster", "")
+    Settings.parse(form.getfirst("settings", ""))
 
     mlst = Monsters.MonsterFactory(monster, mode)
 

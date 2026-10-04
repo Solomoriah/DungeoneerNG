@@ -127,7 +127,7 @@ _treasure_table = {
             (50, _gen_coins, ("gp",  3, 6, 0,  100)),
             (25, _gen_gems,  (1, 6, 0, 1)),
             (25, _gen_art,   (1, 6, 0, 1)),
-            (10, _gen_magic, ("AW", 0, 0, 1, 1)),
+            (10, _gen_magic, ("Any", 0, 0, 1, 1)),
          ],
     'C': [
             (60, _gen_coins, ("cp", 6, 6, 0,  100)),

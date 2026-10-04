@@ -1,6 +1,4 @@
-#!/usr/bin/python3
-
-# Basic Fantasy RPG DungeoneerNG Suite
+# Basic Fantasy RPG Dungeoneer Suite
 # Copyright 2007-2026 Chris Gonnerman
 # All rights reserved.
 #
@@ -32,40 +30,15 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-import cgi, time, sys
+settings = {}
 
-try:
-    sys.path.append(".")
-    from DungeoneerNG import Monsters, Settings
-    form = cgi.FieldStorage()
-    target = form.getfirst("target", "").lower()
-    Settings.parse(form.getfirst("settings", ""))
-    Monsters.load_additional()
-    rc = []
-    if target:
-        keys = sorted(Monsters.monsters.keys())
-        for key in keys:
-            if key.lower().startswith(target):
-                m = Monsters.monsters[key]
-                dngnoapp = [ "one" ]
-                if "noapprolldungeon" in m:
-                    dngnoapp.append("dungeon")
-                if "noapprolllair" in m:
-                    dngnoapp.append("lair")
-                if "noapprollwild" in m:
-                    dngnoapp.append("wild")
-                rc.append((key, ",".join(dngnoapp)))
-            if len(rc) == 40:
-                break
-    print("Content-type: text/html\n")
-    print("\n".join(map(lambda s: "<option value='%s' data-noapp='%s'>%s</option>" % (s[0], s[1], s[0]), rc)))
-
-except:
-    import traceback
-    print("Content-type: text/plain\n")
-    print("<pre>")
-    traceback.print_exc(file = sys.stdout)
-    print("</pre>")
+def parse(parms):
+    for item in filter(None, map(lambda s: s.strip(), parms.split(";"))):
+        fullkey, value = item.split(":")
+        group, key = fullkey.split(".")
+        if group not in settings:
+            settings[group] = {}
+        settings[group][key] = value.strip()
 
 
-# end of file.
+# end of script.

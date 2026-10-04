@@ -30,17 +30,37 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-from . import _CoreMonsters, _BeastsOfBurden, Dice, Spells, Adventurer, Tables, Treasure, ODT, Formatter
+from . import _CoreMonsters, _BeastsOfBurden, Dice, Spells, Adventurer, Tables, Treasure, ODT, Formatter, Settings
 
 
 monsters = {}
 monsters.update(_CoreMonsters.monsters)
 monsters.update(_BeastsOfBurden.monsters)
 
+__is_init = False
+
+
+# will make this more general after Omnibus comes out
+
+def load_additional():
+    global __is_init
+
+    if __is_init:
+        return
+    __is_init = True
+
+    if "monsters" not in Settings.settings:
+        return
+
+    if int(Settings.settings["monsters"].get("vampires", "0")):
+        from . import _VampireMonsters
+        monsters.update(_VampireMonsters.monsters)
+
 
 class Monster(object):
 
     def __init__(self, name, mode = "one", noapp = None):
+        load_additional()
         self.category = "monster"
         m = monsters[name]
         notes = []
@@ -414,6 +434,8 @@ def DragonFactory(prime, name, mode, agecategory = 0):
 
 
 def MonsterFactory(name, mode = "one"):
+
+    load_additional()
 
     # adjustments for Encounter.py
     if mode == "city":
